@@ -1,0 +1,11 @@
+Derrubar a porta 8080 em uso:
+1- No eclipse:
+* clicar no botão para parar o serviço no console.
+
+2- No bash ou prompt cmdo:
+* identificar o pid em atividade:
+netstat -aon | findstr :8080
+
+* para o pid em atividade:
+
+taskkill /PID 1234 /F
