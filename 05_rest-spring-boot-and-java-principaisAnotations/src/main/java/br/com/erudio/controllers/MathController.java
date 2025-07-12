@@ -21,9 +21,9 @@ public class MathController {
 	// http://localhost:8080/math/sum/3/5
 	@RequestMapping("/sum/{numberOne}/{numberTwo}")
 	public Double sum(
-			@PathVariable("numberOne") String numberOne, 
-			@PathVariable("numberTwo")  String numberTwo
-			) throws Exception{
+		@PathVariable("numberOne") String numberOne, 
+		@PathVariable("numberTwo") String numberTwo
+	) throws Exception{
 		if(!nv.isNumeric(numberOne) || !nv.isNumeric(numberTwo)) 
 			throw new UnsupportedMathOperationException("Por favor, entre com um valor numérico");
 		return sm.sum(nc.convertToDouble(numberOne), nc.convertToDouble(numberTwo));
@@ -33,9 +33,9 @@ public class MathController {
 	// http://localhost:8080/math/subtraction/3/5
 	@RequestMapping("/subtraction/{numberOne}/{numberTwo}")
 	public Double subtraction(
-			@PathVariable("numberOne") String numberOne, 
-			@PathVariable("numberTwo")  String numberTwo
-			) throws Exception{
+		@PathVariable("numberOne") String numberOne, 
+		@PathVariable("numberTwo")  String numberTwo
+	) throws Exception{
 		if(!nv.isNumeric(numberOne) || !nv.isNumeric(numberTwo)) 
 			throw new UnsupportedMathOperationException("Por favor, entre com um valor numérico");
 		return sm.subtraction(nc.convertToDouble(numberOne), nc.convertToDouble(numberTwo));
@@ -44,9 +44,9 @@ public class MathController {
 	// http://localhost:8080/math/division/3/5
 	@RequestMapping("/division/{numberOne}/{numberTwo}")
 	public Double division(
-			@PathVariable("numberOne") String numberOne, 
-			@PathVariable("numberTwo")  String numberTwo
-			) throws Exception{
+		@PathVariable("numberOne") String numberOne, 
+		@PathVariable("numberTwo")  String numberTwo
+	) throws Exception{
 		if(!nv.isNumeric(numberOne) || !nv.isNumeric(numberTwo)) 
 			throw new UnsupportedMathOperationException("Por favor, entre com um valor numérico válido");
 		if(numberTwo.equalsIgnoreCase("0"))
@@ -57,9 +57,9 @@ public class MathController {
 	// http://localhost:8080/math/multiplication/3/5
 	@RequestMapping("/multiplication/{numberOne}/{numberTwo}")
 	public Double multiplication(
-			@PathVariable("numberOne") String numberOne, 
-			@PathVariable("numberTwo")  String numberTwo
-			) throws Exception{
+		@PathVariable("numberOne") String numberOne, 
+		@PathVariable("numberTwo")  String numberTwo
+	) throws Exception{
 		if(!nv.isNumeric(numberOne) || !nv.isNumeric(numberTwo)) 
 			throw new UnsupportedMathOperationException("Por favor, entre com um valor numérico");
 		return sm.multiplication(nc.convertToDouble(numberOne), nc.convertToDouble(numberTwo));
@@ -68,9 +68,9 @@ public class MathController {
 	// http://localhost:8080/math/mean/3/5
 	@RequestMapping("/mean/{numberOne}/{numberTwo}")
 	public Double mean(
-			@PathVariable("numberOne") String numberOne, 
-			@PathVariable("numberTwo")  String numberTwo
-			) throws Exception{
+		@PathVariable("numberOne") String numberOne, 
+		@PathVariable("numberTwo")  String numberTwo
+	) throws Exception{
 		if(!nv.isNumeric(numberOne) || !nv.isNumeric(numberTwo)) 
 			throw new UnsupportedMathOperationException("Por favor, entre com um valor numérico");
 		return sm.mean(nc.convertToDouble(numberOne), nc.convertToDouble(numberTwo));
@@ -79,8 +79,8 @@ public class MathController {
 	// http://localhost:8080/math/squareRoot/3/5
 	@RequestMapping("/squareRoot/{number}")
 	public Double squareRoot(
-			@PathVariable("number") String number
-			) throws Exception{
+		@PathVariable("number") String number
+	) throws Exception{
 		if(!nv.isNumeric(number)) 
 			throw new UnsupportedMathOperationException("Por favor, entre com um valor numérico");
 		return sm.squareRoot(nc.convertToDouble(number));
