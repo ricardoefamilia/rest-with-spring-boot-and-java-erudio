@@ -16,5 +16,5 @@ spring:
 logging:
   level:
     #root: TRACE / DEBUG / INFO / WARN / ERROR
-    root: WARN
+    root: INFO
     #br.com.erudio: DEBUG
