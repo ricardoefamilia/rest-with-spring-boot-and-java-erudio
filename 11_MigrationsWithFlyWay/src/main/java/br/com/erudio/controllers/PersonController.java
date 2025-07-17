@@ -18,7 +18,7 @@ import br.com.erudio.data.dto.PersonDTO;
 import br.com.erudio.services.PersonServices;
 
 @RestController
-@RequestMapping("/person")
+@RequestMapping("/api/person/v1")
 public class PersonController {
 
 	@Autowired
