@@ -1,29 +1,49 @@
 package br.com.erudio.data.dto;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import br.com.erudio.serializer.GenderSerializer;
+
+//import com.fasterxml.jackson.annotation.JsonIgnore;
+//import com.fasterxml.jackson.annotation.JsonProperty;
+//import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 //mudando a ordem dos dados 
-@JsonPropertyOrder({"id", "address", "first_name", "last_name", "gender"})
+//@JsonPropertyOrder({"id", "address", "first_name", "last_name", "gender"})
+@JsonFilter("PersonFilter")
 public class PersonDTO implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 
 	private Long id;
 	
-	@JsonProperty("first_name")
+	//@JsonProperty("first_name")
 	private String firstName;
 	
-	@JsonProperty("last_name")
+	//@JsonProperty("last_name")
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private String lastName;
+	
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
+	private String phoneNumber;
+	
+	@JsonFormat(pattern = "dd/MM/yyyy")
+	private Date birthDay;
 	private String address;
 	
-	@JsonIgnore
+	//@JsonIgnore
+	@JsonSerialize(using = GenderSerializer.class)
 	private String gender;
+	
+	
+	private String sensitiveData;
 	
 	public PersonDTO() {}
 
@@ -51,6 +71,22 @@ public class PersonDTO implements Serializable{
 		this.lastName = lastName;
 	}
 
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+	public Date getBirthDay() {
+		return birthDay;
+	}
+
+	public void setBirthDay(Date birthDay) {
+		this.birthDay = birthDay;
+	}
+
 	public String getAddress() {
 		return address;
 	}
@@ -67,13 +103,21 @@ public class PersonDTO implements Serializable{
 		this.gender = gender;
 	}
 
+	public String getSensitiveData() {
+		return sensitiveData;
+	}
+
+	public void setSensitiveData(String sensitiveData) {
+		this.sensitiveData = sensitiveData;
+	}
+
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(address, firstName, gender, id, lastName);
+		return Objects.hash(address, birthDay, firstName, gender, id, lastName, phoneNumber, sensitiveData);
 	}
 
 	@Override
@@ -85,10 +129,10 @@ public class PersonDTO implements Serializable{
 		if (getClass() != obj.getClass())
 			return false;
 		PersonDTO other = (PersonDTO) obj;
-		return Objects.equals(address, other.address) && Objects.equals(firstName, other.firstName)
-				&& Objects.equals(gender, other.gender) && Objects.equals(id, other.id)
-				&& Objects.equals(lastName, other.lastName);
+		return Objects.equals(address, other.address) && Objects.equals(birthDay, other.birthDay)
+				&& Objects.equals(firstName, other.firstName) && Objects.equals(gender, other.gender)
+				&& Objects.equals(id, other.id) && Objects.equals(lastName, other.lastName)
+				&& Objects.equals(phoneNumber, other.phoneNumber) && Objects.equals(sensitiveData, other.sensitiveData);
 	}
-	
-	
+
 }

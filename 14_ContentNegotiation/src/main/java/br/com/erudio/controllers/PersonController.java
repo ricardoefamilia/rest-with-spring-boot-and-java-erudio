@@ -1,6 +1,5 @@
 package br.com.erudio.controllers;
 
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,14 +32,7 @@ public class PersonController {
 	
 	@GetMapping(value = "/{id}", produces= MediaType.APPLICATION_JSON_VALUE)
 	public PersonDTO findById(@PathVariable("id") Long id) {
-		var person = service.findById(id);
-		//exemplo de data para rodar o projeto
-		person.setBirthDay(new Date());
-		//person.setPhoneNumber("+55 (61)99888-7777");
-		person.setPhoneNumber("");
-		person.setLastName(null);
-		person.setSensitiveData("Cafeteria");
-		return person;
+		return service.findById(id);
 	}
 	
 	@PostMapping(
