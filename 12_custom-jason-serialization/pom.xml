@@ -13,9 +13,9 @@
     </parent>
 
     <groupId>br.com.erudio</groupId>
-    <artifactId>11_MigrationsWithFlyWay</artifactId>
+    <artifactId>12_custom-jason-serialization</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>11_MigrationsWithFlyWay</name>
+    <name>12_custom-jason-serialization</name>
 
     <properties>
         <java.version>21</java.version>
