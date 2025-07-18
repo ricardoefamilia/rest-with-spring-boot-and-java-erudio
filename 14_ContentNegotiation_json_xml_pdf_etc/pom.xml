@@ -13,9 +13,9 @@
     </parent>
 
     <groupId>br.com.erudio</groupId>
-    <artifactId>14_ContentNegotiation</artifactId>
+    <artifactId>14_ContentNegotiation_json_xml_pdf_etc</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>14_ContentNegotiation</name>
+    <name>14_ContentNegotiation_json_xml_pdf_etc</name>
 
     <properties>
         <java.version>21</java.version>
