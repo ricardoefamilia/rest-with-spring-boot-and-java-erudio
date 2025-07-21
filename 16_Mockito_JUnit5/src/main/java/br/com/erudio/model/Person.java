@@ -1,19 +1,41 @@
-package br.com.erudio.data.dto;
+package br.com.erudio.model;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-public class PersonDTO implements Serializable{
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "person")
+public class Person implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
+	@Column(name = "first_name", nullable = false, length = 80)
 	private String firstName;
+	
+	@Column(name = "last_name", nullable = false, length = 80)
 	private String lastName;
+	
+//	@Column(name = "birth_day", nullable = true, length = 80)
+//	private String birthDay;
+	
+	@Column(nullable = false, length = 100)
 	private String address;
+	
+	@Column(nullable = false, length = 10)
 	private String gender;
 	
-	public PersonDTO() {}
+	public Person() {}
 
 	public Long getId() {
 		return id;
@@ -72,7 +94,7 @@ public class PersonDTO implements Serializable{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PersonDTO other = (PersonDTO) obj;
+		Person other = (Person) obj;
 		return Objects.equals(address, other.address) && Objects.equals(firstName, other.firstName)
 				&& Objects.equals(gender, other.gender) && Objects.equals(id, other.id)
 				&& Objects.equals(lastName, other.lastName);
