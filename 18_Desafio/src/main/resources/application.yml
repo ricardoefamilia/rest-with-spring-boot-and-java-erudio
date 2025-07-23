@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: rest-with-spring-boot-and-java-erudio
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/rest_with_spring_boot_java?useTimeZone=true&serverTimezone=UTC
+    username: root
+    password: "#Brst516#"
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+    show-sql: false
+    open-in-view: false
+logging:
+  level:
+    #root: TRACE / DEBUG / INFO / WARN / ERROR
+    root: INFO
+    #br.com.erudio: DEBUG
+spring-doc:
+  paths-to-match: /api/**/v1/**
+  swagger-ui:
+    use-root-path: true
