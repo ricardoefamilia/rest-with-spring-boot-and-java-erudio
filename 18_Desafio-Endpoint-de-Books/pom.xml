@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>br.com.erudio</groupId>
-	<artifactId>18_Desafio</artifactId>
+	<artifactId>18_Desafio-Endpoint-de-Books</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>18_Desafio</name>
+	<name>18_Desafio-Endpoint-de-Books</name>
 
 	<properties>
 		<java.version>21</java.version>
