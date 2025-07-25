@@ -1,6 +1,7 @@
 package br.com.erudio.model;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Objects;
 
 import jakarta.persistence.Column;
@@ -9,9 +10,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 
 @Entity
-@Table(name = "book")
+@Table(name = "books")
 public class Book implements Serializable{
 
 	private static final long serialVersionUID = 1L;
@@ -23,10 +26,11 @@ public class Book implements Serializable{
 	@Column(nullable = false, length = 255)
 	private String author;
 	
-	@Column(name = "launch_date", nullable = false, length = 80)
-	private String launchDate;
+	@Column(name = "launch_date", nullable = false)
+	@Temporal(TemporalType.DATE)
+	private Date launchDate;
 	
-	@Column(nullable = false, length = 18)
+	@Column(nullable = false)
 	private Double price;
 	
 	@Column(nullable = false, length = 255)
@@ -50,11 +54,11 @@ public class Book implements Serializable{
 		this.author = author;
 	}
 
-	public String getLaunchDate() {
+	public Date getLaunchDate() {
 		return launchDate;
 	}
 
-	public void setLaunchDate(String launchDate) {
+	public void setLaunchDate(Date launchDate) {
 		this.launchDate = launchDate;
 	}
 

@@ -9,9 +9,10 @@ import org.springframework.stereotype.Service;
 
 import br.com.erudio.controllers.BookController;
 import br.com.erudio.data.dto.BookDTO;
+import br.com.erudio.exception.RequiredObjectIsNullException;
 import br.com.erudio.exception.ResourceNotFoundException;
 import br.com.erudio.model.Book;
-import br.com.erudio.repository.BookRespository;
+import br.com.erudio.repository.BookRepository;
 
 import static br.com.erudio.mapper.ObjectMapper.parseListObjects;
 import static br.com.erudio.mapper.ObjectMapper.parseObject;
@@ -21,10 +22,10 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Service
 public class BookServices {
 
-	private Logger logger = LoggerFactory.getLogger(PersonServices.class.getName());
+	private Logger logger = LoggerFactory.getLogger(BookServices.class.getName());
 	
 	@Autowired
-	BookRespository repository;
+	BookRepository repository;
 	
 	public List<BookDTO> findAll(){
 		logger.info("Finding all books!");
@@ -45,6 +46,7 @@ public class BookServices {
 	
 	public BookDTO create(BookDTO book) {
 		logger.info("Creating one Book!");
+		if (book == null) throw new RequiredObjectIsNullException();
 		var entity = parseObject(book, Book.class);
 		var dto = parseObject(repository.save(entity), BookDTO.class);
 		addHateoasLinks(dto);
@@ -52,7 +54,8 @@ public class BookServices {
 	}
 	
 	public BookDTO update(BookDTO book) {
-		logger.info("Updating one Person!");
+		logger.info("Updating one Book!");
+		if (book == null) throw new RequiredObjectIsNullException();
 		Book entity =  repository.findById(book.getId())
 				.orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"));
 		
@@ -67,7 +70,7 @@ public class BookServices {
 	}
 	
 	public void delete(Long id) {
-		logger.info("Deleting one Person!");
+		logger.info("Deleting one Book!");
 		
 		Book entity =  repository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"));

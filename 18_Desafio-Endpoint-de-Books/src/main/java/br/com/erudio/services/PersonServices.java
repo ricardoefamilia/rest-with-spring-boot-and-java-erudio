@@ -12,6 +12,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import br.com.erudio.controllers.PersonController;
 import br.com.erudio.data.dto.PersonDTO;
+import br.com.erudio.exception.RequiredObjectIsNullException;
 import br.com.erudio.exception.ResourceNotFoundException;
 
 import static br.com.erudio.mapper.ObjectMapper.parseListObjects;
@@ -48,6 +49,7 @@ public class PersonServices {
 	
 	public PersonDTO create(PersonDTO person) {
 		logger.info("Creating one Person!");
+		if (person == null) throw new RequiredObjectIsNullException();
 		var entity = parseObject(person, Person.class);
 		var dto = parseObject(repository.save(entity), PersonDTO.class);
 		addHateoasLinks(dto);
@@ -56,6 +58,7 @@ public class PersonServices {
 	
 	public PersonDTO update(PersonDTO person) {
 		logger.info("Updating one Person!");
+		if (person == null) throw new RequiredObjectIsNullException();
 		Person entity =  repository.findById(person.getId())
 				.orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"));
 		

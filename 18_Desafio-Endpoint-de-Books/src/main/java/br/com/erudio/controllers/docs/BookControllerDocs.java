@@ -17,7 +17,7 @@ public interface BookControllerDocs {
 	@Operation(
 			summary = "Find All Books", 
 			description = "Find All Books",
-			tags = {"Books"},
+			tags = {"Book"},
 			responses = {
 					@ApiResponse(
 							description = "Success", 
@@ -40,7 +40,7 @@ public interface BookControllerDocs {
 	@Operation(
 			summary = "Find a book", 
 			description = "Find a specific book by your ID",
-			tags = {"Books"},
+			tags = {"Book"},
 			responses = {
 					@ApiResponse(
 							description = "Success", 
@@ -59,7 +59,7 @@ public interface BookControllerDocs {
 	@Operation(
 			summary = "Add a book", 
 			description = "Add a specific book",
-			tags = {"Books"},
+			tags = {"Book"},
 			responses = {
 					@ApiResponse(
 							description = "Success", 
@@ -78,7 +78,7 @@ public interface BookControllerDocs {
 	@Operation(
 			summary = "Update a book", 
 			description = "Update a specific book",
-			tags = {"Books"},
+			tags = {"Book"},
 			responses = {
 					@ApiResponse(
 							description = "Success", 
@@ -97,7 +97,7 @@ public interface BookControllerDocs {
 	@Operation(
 			summary = "Delete a book", 
 			description = "Delete a specific book by ID",
-			tags = {"Books"},
+			tags = {"Book"},
 			responses = {
 					@ApiResponse(
 							description = "Success", 
