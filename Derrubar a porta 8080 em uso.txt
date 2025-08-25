@@ -11,3 +11,4 @@ netstat -aon | findstr :8080
 taskkill /PID 1234 /F
 
 
+"-Djava.security.egd=file:/dev/./urandom",
