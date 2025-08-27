@@ -3,13 +3,14 @@ package br.com.erudio.integrationtests.swagger;
 
 
 import static org.junit.Assert.assertTrue;
+
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import br.com.erudio.config.TestConfigs;
 import br.com.erudio.integrationtests.testcontainers.AbstractIntegrationTest;
-import net.bytebuddy.NamingStrategy.Suffixing.BaseNameResolver.ForGivenType;
+import static io.restassured.RestAssured.given;
 
-import io.restassured.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class SwaggerIntegrationTest extends AbstractIntegrationTest {
