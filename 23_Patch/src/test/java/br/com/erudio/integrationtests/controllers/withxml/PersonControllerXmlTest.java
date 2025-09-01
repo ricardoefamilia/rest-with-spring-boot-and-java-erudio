@@ -1,4 +1,4 @@
-package br.com.erudio.integrationtests.controllers.withjson;
+package br.com.erudio.integrationtests.controllers.withxml;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,7 +17,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 import br.com.erudio.config.TestConfigs;
 import br.com.erudio.integrationtests.dto.PersonDTO;
@@ -32,18 +32,18 @@ import static io.restassured.RestAssured.given;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class PersonControllerJsonTest extends AbstractIntegrationTest {
+class PersonControllerXmlTest extends AbstractIntegrationTest {
 
 	@LocalServerPort
 	private int port;
 
 	private static RequestSpecification specification;
-	private static ObjectMapper objectMapper;
+	private static XmlMapper objectMapper;
 	private static PersonDTO person;
 
 	@BeforeAll
 	static void setUp() {
-		objectMapper = new ObjectMapper();
+		objectMapper = new XmlMapper();
 		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
 		person = new PersonDTO();
@@ -63,13 +63,14 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 				.build();
 
 		var content = given(specification)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.contentType(MediaType.APPLICATION_XML_VALUE)
+				.accept(MediaType.APPLICATION_XML_VALUE)
 					.body(person)
 				.when()
 					.post()
 				.then()
 					.statusCode(200)
-					.contentType(MediaType.APPLICATION_JSON_VALUE)
+					.contentType(MediaType.APPLICATION_XML_VALUE)
 				.extract()
 					.body()
 						.asString();
@@ -96,13 +97,14 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 		person.setLastName("Leonard Spencer-Churchill");
 		
 		var content = given(specification)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.contentType(MediaType.APPLICATION_XML_VALUE)
+				.accept(MediaType.APPLICATION_XML_VALUE)
 				.body(person)
 				.when()
 				.put()
 				.then()
 					.statusCode(200)
-					.contentType(MediaType.APPLICATION_JSON_VALUE)
+					.contentType(MediaType.APPLICATION_XML_VALUE)
 				.extract()
 				.body()
 				.asString();
@@ -128,13 +130,14 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	void testFindById() throws JsonMappingException, JsonProcessingException {
 
 		var content = given(specification)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.contentType(MediaType.APPLICATION_XML_VALUE)
+				.accept(MediaType.APPLICATION_XML_VALUE)
 				.pathParam("id", person.getId())
 				.when()
 				.get("{id}")
 				.then()
 					.statusCode(200)
-					.contentType(MediaType.APPLICATION_JSON_VALUE)
+					.contentType(MediaType.APPLICATION_XML_VALUE)
 				.extract()
 				.body()
 				.asString();
@@ -159,13 +162,13 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	void testDisable() throws JsonMappingException, JsonProcessingException {
 		
 		var content = given(specification)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.accept(MediaType.APPLICATION_XML_VALUE)
 				.pathParam("id", person.getId())
 				.when()
 				.patch("{id}")
 				.then()
 					.statusCode(200)
-					.contentType(MediaType.APPLICATION_JSON_VALUE)
+					.contentType(MediaType.APPLICATION_XML_VALUE)
 				.extract()
 				.body()
 				.asString();
@@ -199,7 +202,7 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	
 	@Test
 	@Order(6)
-	void testFindAll() throws JsonProcessingException {
+	void testFindAll() throws JsonMappingException, JsonProcessingException {
 	    // Cria algumas pessoas
 	    for (int i = 1; i <= 5; i++) {
 	        PersonDTO p = new PersonDTO();
@@ -208,10 +211,14 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	        p.setAddress("Address" + i);
 	        p.setGender("Male");
 	        p.setEnabled(true);
+	        
+	        // Serializa o objeto para XML
+	        String xmlBody = objectMapper.writeValueAsString(p);
 
 	        var content = given(specification)
-	            .contentType(MediaType.APPLICATION_JSON_VALUE)
-	            .body(p)
+				.contentType(MediaType.APPLICATION_XML_VALUE)
+				.accept(MediaType.APPLICATION_XML_VALUE)
+	            .body(xmlBody)
 	        .when()
 	            .post()
 	        .then()
@@ -226,7 +233,7 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 
 	    // Agora sim chama o findAll
 	    var content = given(specification)
-	            .accept(MediaType.APPLICATION_JSON_VALUE)
+	            .accept(MediaType.APPLICATION_XML_VALUE)
 	            .when()
 	            .get()
 	            .then()
