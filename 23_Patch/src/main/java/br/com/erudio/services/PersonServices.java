@@ -20,6 +20,7 @@ import static br.com.erudio.mapper.ObjectMapper.parseListObjects;
 import static br.com.erudio.mapper.ObjectMapper.parseObject;
 import br.com.erudio.model.Person;
 import br.com.erudio.repository.PersonRepository;
+import jakarta.transaction.Transactional;
 
 @Service
 public class PersonServices {
@@ -71,6 +72,20 @@ public class PersonServices {
 		return dto;
 	}
 	
+	@Transactional
+	public PersonDTO disablePerson(Long id) {
+		logger.info("Disableding one Person!");
+		
+		repository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Disabled Person!"));
+		
+		repository.disablePerson(id);
+		var entity = repository.findById(id).get();
+		var dto = parseObject(entity, PersonDTO.class);
+		addHateoasLinks(dto);
+		return dto;
+	}
+	
 	public void delete(Long id) {
 		logger.info("Deleting one Person!");
 		
@@ -85,6 +100,7 @@ public class PersonServices {
 		dto.add(linkTo(methodOn(PersonController.class).findAll()).withRel("findAll").withType("GET"));
 		dto.add(linkTo(methodOn(PersonController.class).create(dto)).withRel("create").withType("POST"));
 		dto.add(linkTo(methodOn(PersonController.class).update(dto)).withRel("update").withType("PUT"));
+		dto.add(linkTo(methodOn(PersonController.class).disablePerson(dto.getId())).withRel("disable").withType("PATCH"));
 		dto.add(linkTo(methodOn(PersonController.class).delete(dto.getId())).withRel("delete").withType("DELETE"));
 	}
 }

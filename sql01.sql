@@ -1,0 +1,1 @@
+rest_with_spring_boot_javarest_with_spring_boot_javarest_with_spring_boot_javainformation_schemarest_with_spring_boot_javarest_with_spring_boot_javaSELECT * FROM `person` LIMIT 1000

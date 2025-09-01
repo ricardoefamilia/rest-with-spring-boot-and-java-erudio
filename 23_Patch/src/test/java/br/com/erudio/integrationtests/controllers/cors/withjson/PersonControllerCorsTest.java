@@ -1,4 +1,4 @@
-package br.com.erudio.integrationtests.controllers.withjson;
+package br.com.erudio.integrationtests.controllers.cors.withjson;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,10 +27,10 @@ import io.restassured.specification.RequestSpecification;
 
 import static io.restassured.RestAssured.given;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class PersonControllerTest extends AbstractIntegrationTest {
-	
+class PersonControllerCorsTest extends AbstractIntegrationTest {
+
 	@LocalServerPort
 	private int port;
 
@@ -42,36 +42,24 @@ class PersonControllerTest extends AbstractIntegrationTest {
 	static void setUp() {
 		objectMapper = new ObjectMapper();
 		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-		
+
 		person = new PersonDTO();
 	}
-	
 
 	@Test
 	@Order(1)
 	void testCreate() throws JsonMappingException, JsonProcessingException {
 		mockPerson();
-		
-		specification = new RequestSpecBuilder()
-				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_ERUDIO)
-				.setBasePath("/api/person/v1")
-				.setPort(port)  // porta dinâmica
-					.addFilter(new RequestLoggingFilter(LogDetail.ALL))
-					.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+
+		specification = new RequestSpecBuilder().addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_ERUDIO)
+				.setBasePath("/api/person/v1").setPort(port) // porta dinâmica
+				.addFilter(new RequestLoggingFilter(LogDetail.ALL)).addFilter(new ResponseLoggingFilter(LogDetail.ALL))
 				.build();
-		
-		var content = given()
-				.spec(specification)   // usa a specification já configurada
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-					.body(person)
-				.when()
-					.post()
-				.then()
-					.statusCode(200)
-				.extract()
-					.body()
-						.asString();
-		
+
+		var content = given(specification)
+				.contentType(MediaType.APPLICATION_JSON_VALUE).body(person).when().post().then().statusCode(200)
+				.extract().body().asString();
+
 		PersonDTO createdPerson = objectMapper.readValue(content, PersonDTO.class);
 		person = createdPerson;
 
@@ -80,72 +68,49 @@ class PersonControllerTest extends AbstractIntegrationTest {
 		assertNotNull(createdPerson.getLastName());
 		assertNotNull(createdPerson.getAddress());
 		assertNotNull(createdPerson.getGender());
-		
+
 		assertTrue(createdPerson.getId() > 0);
 
 		assertEquals("Richard", createdPerson.getFirstName());
 		assertEquals("Stallman", createdPerson.getLastName());
 		assertEquals("New York City - New York - USA", createdPerson.getAddress());
 		assertEquals("Male", createdPerson.getGender());
-		
+
 		assertTrue(createdPerson.getId() > 0);
-		
+
 	}
 
 	@Test
 	@Order(2)
 	void testCorsBlockedOrigin() throws JsonProcessingException {
-//	    mockPerson();
 
-	    // Specification com origem não autorizada
-	    var blockedSpec = new RequestSpecBuilder()
-	            .addHeader(TestConfigs.HEADER_PARAM_ORIGIN, "http://localhost:4000") // origem não permitida
-	            .setBasePath("/api/person/v1")
-	            .setPort(port)
-	            .addFilter(new RequestLoggingFilter(LogDetail.ALL))
-	            .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-	            .build();
+		// Specification com origem não autorizada
+		var blockedSpec = new RequestSpecBuilder().addHeader(TestConfigs.HEADER_PARAM_ORIGIN, "http://localhost:4000") // origem
+																														// não
+																														// permitida
+				.setBasePath("/api/person/v1").setPort(port).addFilter(new RequestLoggingFilter(LogDetail.ALL))
+				.addFilter(new ResponseLoggingFilter(LogDetail.ALL)).build();
 
-	    // Envio da requisição
-	    String content = given()
-	        .spec(blockedSpec)
-	        .contentType(MediaType.APPLICATION_JSON_VALUE)
-	        .body(person)
-	    .when()
-	        .post()
-	    .then()
-	        // Esperamos status 403 ou 401 dependendo da configuração do Spring
-	        .statusCode(403)
-		    .extract()
-	        .asString();  // 👈 aqui pega o conteúdo do body
-	    
-	    assertEquals("Invalid CORS request", content);
+		// Envio da requisição
+		String content = given(blockedSpec).contentType(MediaType.APPLICATION_JSON_VALUE).body(person).when()
+				.post().then()
+				// Esperamos status 403 ou 401 dependendo da configuração do Spring
+				.statusCode(403).extract().asString(); // 👈 aqui pega o conteúdo do body
+
+		assertEquals("Invalid CORS request", content);
 
 	}
 
 	@Test
 	@Order(3)
 	void testFindById() throws JsonMappingException, JsonProcessingException {
-		specification = new RequestSpecBuilder()
-				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_HOST3000)
-				.setBasePath("/api/person/v1")
-				.setPort(port)  
-					.addFilter(new RequestLoggingFilter(LogDetail.ALL))
-					.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-				.build();
-		
-		var content = given()
-				.spec(specification)  
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-					.pathParam("id", person.getId())
-				.when()
-					.get("{id}")
-				.then()
-					.statusCode(200)
-				.extract()
-					.body()
-						.asString();
-		
+		specification = new RequestSpecBuilder().addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_HOST3000)
+				.setBasePath("/api/person/v1").setPort(port).addFilter(new RequestLoggingFilter(LogDetail.ALL))
+				.addFilter(new ResponseLoggingFilter(LogDetail.ALL)).build();
+
+		var content = given(specification).contentType(MediaType.APPLICATION_JSON_VALUE)
+				.pathParam("id", person.getId()).when().get("{id}").then().statusCode(200).extract().body().asString();
+
 		PersonDTO createdPerson = objectMapper.readValue(content, PersonDTO.class);
 		person = createdPerson;
 
@@ -154,40 +119,28 @@ class PersonControllerTest extends AbstractIntegrationTest {
 		assertNotNull(createdPerson.getLastName());
 		assertNotNull(createdPerson.getAddress());
 		assertNotNull(createdPerson.getGender());
-		
+
 		assertTrue(createdPerson.getId() > 0);
 
 		assertEquals("Richard", createdPerson.getFirstName());
 		assertEquals("Stallman", createdPerson.getLastName());
 		assertEquals("New York City - New York - USA", createdPerson.getAddress());
 		assertEquals("Male", createdPerson.getGender());
-		
+
 		assertTrue(createdPerson.getId() > 0);
+		assertTrue(createdPerson.getEnabled());
 	}
-	
+
 	@Test
 	@Order(4)
 	void testFindByIdWithWrongOrigin() throws JsonMappingException, JsonProcessingException {
-		specification = new RequestSpecBuilder()
-				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, "http://localhost:4000")
-				.setBasePath("/api/person/v1")
-				.setPort(port)  
-				.addFilter(new RequestLoggingFilter(LogDetail.ALL))
-				.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-				.build();
-		
-		String content = given()
-				.spec(specification)  
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.pathParam("id", person.getId())
-				.when()
-				.get("{id}")
-				.then()
-				.statusCode(403)
-				.extract()
-				.body()
-				.asString();
-		
+		specification = new RequestSpecBuilder().addHeader(TestConfigs.HEADER_PARAM_ORIGIN, "http://localhost:4000")
+				.setBasePath("/api/person/v1").setPort(port).addFilter(new RequestLoggingFilter(LogDetail.ALL))
+				.addFilter(new ResponseLoggingFilter(LogDetail.ALL)).build();
+
+		String content = given(specification).contentType(MediaType.APPLICATION_JSON_VALUE)
+				.pathParam("id", person.getId()).when().get("{id}").then().statusCode(403).extract().body().asString();
+
 		assertEquals("Invalid CORS request", content);
 	}
 
@@ -196,5 +149,6 @@ class PersonControllerTest extends AbstractIntegrationTest {
 		person.setLastName("Stallman");
 		person.setAddress("New York City - New York - USA");
 		person.setGender("Male");
+		person.setEnabled(true);
 	}
 }

@@ -9,7 +9,7 @@ import br.com.erudio.model.Person;
 
 public interface PersonRepository extends JpaRepository<Person, Long>{
 	
-	@Modifying
+	@Modifying(clearAutomatically = true)
 	@Query("UPDATE Person p SET p.enabled = false where p.id = :id")
 	void disablePerson(@Param("id") Long id);
 }
