@@ -58,6 +58,13 @@
 		    <scope>runtime</scope>
 		</dependency>
 		
+		<!-- Flyway para as migrations sql -->
+		<dependency>
+		    <groupId>org.flywaydb</groupId>
+		    <artifactId>flyway-mysql</artifactId>
+		    <version>10.17.0</version> <!-- versão que suporta MySQL 8 -->
+		</dependency>
+
 		<!-- Dozer mepear java bean -->
 		<dependency>
 		    <groupId>com.github.dozermapper</groupId>
