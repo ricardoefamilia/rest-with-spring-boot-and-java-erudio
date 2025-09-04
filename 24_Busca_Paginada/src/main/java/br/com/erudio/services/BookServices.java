@@ -67,8 +67,9 @@ public class BookServices {
 	}
 	
 	public BookDTO create(BookDTO book) {
-		logger.info("Creating one Book!");
 		if (book == null) throw new RequiredObjectIsNullException();
+		
+		logger.info("Creating one Book!");
 		var entity = parseObject(book, Book.class);
 		var dto = parseObject(repository.save(entity), BookDTO.class);
 		addHateoasLinks(dto);

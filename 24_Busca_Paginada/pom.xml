@@ -24,75 +24,88 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+	
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
+	
 		<dependency>
 			<groupId>org.springframework.hateoas</groupId>
 			<artifactId>spring-hateoas</artifactId>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
+	
+		<!-- OpenAPI / Swagger -->
 		<dependency>
 		    <groupId>org.springdoc</groupId>
 		    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 		    <version>${springdoc.version}</version>
 		</dependency>
-		
-		<!-- fasterxml jackson requeried e response xml e json -->
+	
+		<!-- Jackson XML -->
 		<dependency>
-        	<groupId>com.fasterxml.jackson.dataformat</groupId>
-        	<artifactId>jackson-dataformat-xml</artifactId>
-        </dependency>
-        
-		<!-- fasterxml jackson requeried e response yaml ou yml -->
+	    	<groupId>com.fasterxml.jackson.dataformat</groupId>
+	    	<artifactId>jackson-dataformat-xml</artifactId>
+	    </dependency>
+	
+		<!-- Jackson YAML -->
 		<dependency>
-        	<groupId>com.fasterxml.jackson.dataformat</groupId>
-        	<artifactId>jackson-dataformat-yaml</artifactId>
-        </dependency>
-		
-		<!-- https://mvnrepository.com/artifact/com.mysql/mysql-connector-j -->
+	    	<groupId>com.fasterxml.jackson.dataformat</groupId>
+	    	<artifactId>jackson-dataformat-yaml</artifactId>
+	    </dependency>
+	
+		<!-- MySQL Connector -->
 		<dependency>
 		    <groupId>com.mysql</groupId>
 		    <artifactId>mysql-connector-j</artifactId>
 		    <scope>runtime</scope>
 		</dependency>
-		
-		<!-- Flyway para as migrations sql -->
+	
+		<!-- Flyway para migrations -->
 		<dependency>
 		    <groupId>org.flywaydb</groupId>
 		    <artifactId>flyway-mysql</artifactId>
-		    <version>10.17.0</version> <!-- versão que suporta MySQL 8 -->
+		    <version>10.17.0</version>
 		</dependency>
-
-		<!-- Dozer mepear java bean -->
+	
+		<!-- Dozer Mapper -->
 		<dependency>
 		    <groupId>com.github.dozermapper</groupId>
 		    <artifactId>dozer-core</artifactId>
 		    <version>${dozer.version}</version>
 		</dependency>
-		
+	
+		<!-- DevTools -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
+	
+		<!-- Starter de testes (já vem com JUnit Jupiter = JUnit 5) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+			<exclusions>
+				<!-- Garante que JUnit 4 não venha junto -->
+				<exclusion>
+					<groupId>junit</groupId>
+					<artifactId>junit</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-		
-		<!-- testcontainers -->
+	
+		<!-- Testcontainers -->
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>mysql</artifactId>
 			<version>${testcontainers.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
-		<!-- rest-assured -->
+	
+		<!-- Rest-Assured -->
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
@@ -100,6 +113,7 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
 
 	<build>
 		<plugins>

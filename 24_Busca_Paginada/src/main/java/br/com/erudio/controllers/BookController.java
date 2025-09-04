@@ -42,7 +42,7 @@ public class BookController implements BookControllerDocs{
 			@RequestParam(value = "direction", defaultValue = "asc") String direction
 			) {
 		var sortDirection = "desc".equalsIgnoreCase(direction) ? Direction.DESC : Direction.ASC;
-		Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "author"));
+		Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "title"));
 		return ResponseEntity.ok(service.findAll(pageable));
 	}
 
@@ -57,7 +57,7 @@ public class BookController implements BookControllerDocs{
 			consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE},
 			produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE}
 		)
-	public BookDTO create(BookDTO book) {
+	public BookDTO create(@RequestBody BookDTO book) {
 		return service.create(book);
 	}
 

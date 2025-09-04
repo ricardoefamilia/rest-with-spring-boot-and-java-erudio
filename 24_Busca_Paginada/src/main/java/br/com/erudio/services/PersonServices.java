@@ -21,6 +21,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import br.com.erudio.controllers.PersonController;
 import br.com.erudio.data.dto.PersonDTO;
+import br.com.erudio.exception.RequiredObjectIsNullException;
 import br.com.erudio.exception.ResourceNotFoundException;
 
 import static br.com.erudio.mapper.ObjectMapper.parseListObjects;
@@ -62,6 +63,28 @@ public class PersonServices {
 		return assembler.toModel(peopleWithLinks, findAllLink);
 	}
 	
+	public PagedModel<EntityModel<PersonDTO>> findByName(String firstName, Pageable pageable) {
+		logger.info("Finding people by name!");
+		
+		var people = repository.findPeopleByName(firstName, pageable);
+		
+		var peopleWithLinks = people.map(person -> {
+			var dto = parseObject(person, PersonDTO.class);
+			addHateoasLinks(dto);
+			return dto;
+		});
+		
+		Link findAllLink = WebMvcLinkBuilder
+				.linkTo(WebMvcLinkBuilder
+						.methodOn(PersonController.class)
+						.findAll(
+								pageable.getPageNumber(), 
+								pageable.getPageSize(), 
+								String.valueOf(pageable.getSort())))
+				.withSelfRel();
+		return assembler.toModel(peopleWithLinks, findAllLink);
+	}
+	
 	public PersonDTO findById(Long id) {
 		logger.info("Finding one Person!");
 		
@@ -74,12 +97,15 @@ public class PersonServices {
 
 	
 	public PersonDTO create(PersonDTO person) {
-		logger.info("Creating one Person!");
-		var entity = parseObject(person, Person.class);
-		var dto = parseObject(repository.save(entity), PersonDTO.class);
-		addHateoasLinks(dto);
-		return dto;
+	    if (person == null) throw new RequiredObjectIsNullException();
+
+	    logger.info("Creating one Person!");
+	    var entity = parseObject(person, Person.class);
+	    var dto = parseObject(repository.save(entity), PersonDTO.class);
+	    addHateoasLinks(dto);
+	    return dto;
 	}
+
 	
 	public PersonDTO update(PersonDTO person) {
 		logger.info("Updating one Person!");
