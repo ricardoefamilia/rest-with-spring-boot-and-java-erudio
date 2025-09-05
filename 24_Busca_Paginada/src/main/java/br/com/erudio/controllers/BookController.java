@@ -1,7 +1,5 @@
 package br.com.erudio.controllers;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +25,7 @@ import br.com.erudio.services.BookServices;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("api/book")
+@RequestMapping("/api/book")
 @Tag(name = "Book", description = "Endpoints for Managing Books")
 public class BookController implements BookControllerDocs{
 

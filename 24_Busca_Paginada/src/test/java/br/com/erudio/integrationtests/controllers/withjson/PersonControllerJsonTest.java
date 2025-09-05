@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.erudio.config.TestConfigs;
 import br.com.erudio.integrationtests.dto.PersonDTO;
+import br.com.erudio.integrationtests.response.json.EmbeddedResponsePersonJson;
 import br.com.erudio.integrationtests.testcontainers.AbstractIntegrationTest;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
@@ -30,7 +32,7 @@ import io.restassured.specification.RequestSpecification;
 
 import static io.restassured.RestAssured.given;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class PersonControllerJsonTest extends AbstractIntegrationTest {
 
@@ -199,44 +201,70 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	
 	@Test
 	@Order(6)
-	void testFindAll() throws JsonProcessingException {
-	    // Cria algumas pessoas
-	    for (int i = 1; i <= 5; i++) {
-	        PersonDTO p = new PersonDTO();
-	        p.setFirstName("Person" + i);
-	        p.setLastName("Last" + i);
-	        p.setAddress("Address" + i);
-	        p.setGender("Male");
-	        p.setEnabled(true);
+	@DisplayName("Deve retornar a página 3 e validar posições específicas")
+	void testFindAllPeopleWithPagination() throws JsonProcessingException {
+		
+		// Configuração da especificação da requisição REST Assured
+	    specification = new RequestSpecBuilder()
+	            .setBasePath("/api/person/v1")
+	            .setPort(port)
+	            .addFilter(new RequestLoggingFilter(LogDetail.ALL))
+	            .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+	            .build();
 
-	        var content = given(specification)
-	            .contentType(MediaType.APPLICATION_JSON_VALUE)
-	            .body(p)
+	    // Chamada GET no endpoint com paginação
+	    String content = given(specification)
+	            .accept(MediaType.APPLICATION_JSON_VALUE)
+	            .queryParams("page", 3, "size", 12, "direction", "asc")
 	        .when()
-	            .post()
+	            .get()
 	        .then()
 	            .statusCode(200)
 	        .extract()
 	            .body()
 	            .asString();
 
-	        // Atualiza o objeto para validação se quiser
-	        objectMapper.readValue(content, PersonDTO.class);
-	    }
+	    // Converte o JSON para EmbeddedResponse<PersonDTO>
+	    EmbeddedResponsePersonJson<PersonDTO> response = objectMapper.readValue(
+	            content, new TypeReference<EmbeddedResponsePersonJson<PersonDTO>>() {});
 
-	    // Agora sim chama o findAll
-	    var content = given(specification)
-	            .accept(MediaType.APPLICATION_JSON_VALUE)
-	            .when()
-	            .get()
-	            .then()
-	                .statusCode(200)
-	            .extract()
-	                .body()
-	                .asString();
+	    // Extrai a lista de pessoas dentro de "_embedded"
+	    List<PersonDTO> people = response.getEmbedded().getPeople();
 
-	    List<PersonDTO> people = objectMapper.readValue(content, new TypeReference<List<PersonDTO>>() {});
-	    assertFalse(people.isEmpty(), "A lista não deve estar vazia");
+	    // Asserções básicas
+	    assertNotNull(people);
+	    assertFalse(people.isEmpty(), "A lista de pessoas não deveria estar vazia");
+	    assertTrue(people.size() <= 12, "O tamanho da página deveria respeitar o size definido");
+
+	    // Verifica posições específicas (0 e 4)
+	    PersonDTO first = people.get(0);
+	    
+	    assertNotNull(first.getId());
+	    assertNotNull(first.getFirstName());
+	    assertNotNull(first.getLastName());
+	    
+	    assertTrue(first.getId() > 0);
+	    
+	    assertEquals("Alvie", first.getFirstName());
+	    assertEquals("Basden", first.getLastName());
+	    assertEquals("14th Floor", first.getAddress());
+	    assertEquals("Male", first.getGender());
+	    assertFalse(first.getEnabled());
+	    
+	    PersonDTO fifth = people.get(4);
+
+	    assertNotNull(fifth.getId());
+	    assertNotNull(fifth.getFirstName());
+	    assertNotNull(fifth.getLastName());
+	    
+	    assertTrue(fifth.getId() > 0);
+	    
+	    assertEquals("Alyson", fifth.getFirstName());
+	    assertEquals("Muge", fifth.getLastName());
+	    assertEquals("Room 397", fifth.getAddress());
+	    assertEquals("Female", fifth.getGender());
+	    assertFalse(fifth.getEnabled());
+	    
 	}
 
 	private void mockPerson() {

@@ -2,6 +2,8 @@ package br.com.erudio.integrationtests.controllers.withyaml;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -18,8 +20,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import br.com.erudio.config.TestConfigs;
 import br.com.erudio.integrationtests.controllers.withyaml.mapper.YAMLMapper;
-import br.com.erudio.integrationtests.dto.PersonDTO;
-import br.com.erudio.integrationtests.response.xml_yaml.PagedModelPerson;
+import br.com.erudio.integrationtests.dto.BookDTO;
+import br.com.erudio.integrationtests.response.xml_yaml.PagedModelBook;
 import br.com.erudio.integrationtests.testcontainers.AbstractIntegrationTest;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.EncoderConfig;
@@ -34,36 +36,36 @@ import static io.restassured.RestAssured.given;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class PersonControllerYamlTest extends AbstractIntegrationTest {
+class BookControllerYamlTest extends AbstractIntegrationTest {
 
 	@LocalServerPort
 	private int port;
 
 	private static RequestSpecification specification;
 	private static YAMLMapper objectMapper;
-	private static PersonDTO person;
+	private static BookDTO book;
 
 	@BeforeAll
 	static void setUp() {
 		objectMapper = new YAMLMapper();
 
-		person = new PersonDTO();
+		book = new BookDTO();
 	}
 
 	@Test
 	@Order(1)
 	void testCreate() throws JsonMappingException, JsonProcessingException {
-		mockPerson();
+		mockBook();
 
 		specification = new RequestSpecBuilder()
 				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_ERUDIO)
-				.setBasePath("/api/person/v1")
+				.setBasePath("/api/book")
 				.setPort(port) // porta dinâmica
 					.addFilter(new RequestLoggingFilter(LogDetail.ALL))
 					.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
 				.build();
 
-		var createdPerson = given().config(
+		var createdBook = given().config(
 				RestAssuredConfig.config()
 					.encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs(
 							MediaType.APPLICATION_YAML_VALUE, ContentType.TEXT))
@@ -71,7 +73,7 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
 				.spec(specification)
 				.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
-					.body(person, objectMapper)
+					.body(book, objectMapper)
 				.when()
 					.post()
 				.then()
@@ -79,29 +81,29 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
 					.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.extract()
 					.body()
-						.as(PersonDTO.class, objectMapper);
+						.as(BookDTO.class, objectMapper);
 
-		person = createdPerson;
+		book = createdBook;
 
-		assertNotNull(createdPerson.getId());
+		assertNotNull(createdBook.getId());
 
-		assertTrue(createdPerson.getId() > 0);
+		assertTrue(createdBook.getId() > 0);
 
-		assertEquals("Winston", createdPerson.getFirstName());
-		assertEquals("Churchill", createdPerson.getLastName());
-		assertEquals("Oxfordshire - England", createdPerson.getAddress());
-		assertEquals("Male", createdPerson.getGender());
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String launchDateStr = sdf.format(createdBook.getLaunchDate());
+		assertEquals("Teste Author", createdBook.getAuthor());
+		assertEquals("2023-03-10", launchDateStr);
+		assertEquals(49.90, createdBook.getPrice());
+		assertEquals("Teste Title", createdBook.getTitle());
 		
-		assertTrue(createdPerson.getEnabled());
-
 	}
 	
 	@Test
 	@Order(2)
 	void testUpdate() throws JsonMappingException, JsonProcessingException {
-		person.setLastName("Leonard Spencer-Churchill");
+		book.setTitle("Teste Title");
 		
-		var createdPerson = given().config(
+		var createdBook = given().config(
 					RestAssuredConfig.config()
 					.encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs(
 							MediaType.APPLICATION_YAML_VALUE, ContentType.TEXT))
@@ -109,7 +111,7 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
 				.spec(specification)
 				.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
-				.body(person, objectMapper)
+				.body(book, objectMapper)
 				.when()
 				.put()
 				.then()
@@ -117,20 +119,20 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
 					.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.extract()
 				.body()
-				.as(PersonDTO.class, objectMapper);
+				.as(BookDTO.class, objectMapper);
 
-		person = createdPerson;
+		book = createdBook;
 		
-		assertNotNull(createdPerson.getId());
+		assertNotNull(createdBook.getId());
 		
-		assertTrue(createdPerson.getId() > 0);
+		assertTrue(createdBook.getId() > 0);
 		
-		assertEquals("Winston", createdPerson.getFirstName());
-		assertEquals("Leonard Spencer-Churchill", createdPerson.getLastName());
-		assertEquals("Oxfordshire - England", createdPerson.getAddress());
-		assertEquals("Male", createdPerson.getGender());
-		
-		assertTrue(createdPerson.getEnabled());
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String launchDateStr = sdf.format(createdBook.getLaunchDate());
+		assertEquals("Teste Author", createdBook.getAuthor());
+		assertEquals("2023-03-10", launchDateStr);
+		assertEquals(49.90, createdBook.getPrice());
+		assertEquals("Teste Title", createdBook.getTitle());
 		
 	}
 	
@@ -138,7 +140,7 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
 	@Order(3)
 	void testFindById() throws JsonMappingException, JsonProcessingException {
 
-		var createdPerson = given().config(
+		var createdBook = given().config(
 					RestAssuredConfig.config()
 					.encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs(
 							MediaType.APPLICATION_YAML_VALUE, ContentType.TEXT))
@@ -146,7 +148,7 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
 				.spec(specification)
 				.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
-				.pathParam("id", person.getId())
+				.pathParam("id", book.getId())
 				.when()
 				.get("{id}")
 				.then()
@@ -154,63 +156,63 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
 					.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.extract()
 				.body()
-				.as(PersonDTO.class, objectMapper);
+				.as(BookDTO.class, objectMapper);
 
-		person = createdPerson;
+		book = createdBook;
 
-		assertNotNull(createdPerson.getId());
+		assertNotNull(createdBook.getId());
 
-		assertTrue(createdPerson.getId() > 0);
+		assertTrue(createdBook.getId() > 0);
 
-		assertEquals("Winston", createdPerson.getFirstName());
-		assertEquals("Leonard Spencer-Churchill", createdPerson.getLastName());
-		assertEquals("Oxfordshire - England", createdPerson.getAddress());
-		assertEquals("Male", createdPerson.getGender());
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String launchDateStr = sdf.format(createdBook.getLaunchDate());
+		assertEquals("Teste Author", createdBook.getAuthor());
+		assertEquals("2023-03-10", launchDateStr);
+		assertEquals(49.90, createdBook.getPrice());
+		assertEquals("Teste Title", createdBook.getTitle());
 
-		assertTrue(createdPerson.getEnabled());
 	}
+	
+//	@Test
+//	@Order(4)
+//	void testDisable() throws JsonMappingException, JsonProcessingException {
+//		
+//		var createdBook = given().config(
+//					RestAssuredConfig.config()
+//					.encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs(
+//							MediaType.APPLICATION_YAML_VALUE, ContentType.TEXT))
+//				)
+//				.spec(specification)
+//				.accept(MediaType.APPLICATION_YAML_VALUE)
+//				.pathParam("id", book.getId())
+//				.when()
+//				.patch("{id}")
+//				.then()
+//					.statusCode(200)
+//					.contentType(MediaType.APPLICATION_YAML_VALUE)
+//				.extract()
+//				.body()
+//				.as(BookDTO.class, objectMapper);
+//		
+//		book = createdBook;
+//		
+//		assertNotNull(createdBook.getId());
+//		
+//		assertTrue(createdBook.getId() > 0);
+//		
+//		assertEquals("Winston", createdBook.getAuthor());
+//		assertEquals("Leonard Spencer-Churchill", createdBook.getLaunchDate());
+//		assertEquals("Oxfordshire - England", createdBook.getPrice());
+//		assertEquals("Male", createdBook.getTitle());
+//		
+//	}
 	
 	@Test
 	@Order(4)
-	void testDisable() throws JsonMappingException, JsonProcessingException {
-		
-		var createdPerson = given().config(
-					RestAssuredConfig.config()
-					.encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs(
-							MediaType.APPLICATION_YAML_VALUE, ContentType.TEXT))
-				)
-				.spec(specification)
-				.accept(MediaType.APPLICATION_YAML_VALUE)
-				.pathParam("id", person.getId())
-				.when()
-				.patch("{id}")
-				.then()
-					.statusCode(200)
-					.contentType(MediaType.APPLICATION_YAML_VALUE)
-				.extract()
-				.body()
-				.as(PersonDTO.class, objectMapper);
-		
-		person = createdPerson;
-		
-		assertNotNull(createdPerson.getId());
-		
-		assertTrue(createdPerson.getId() > 0);
-		
-		assertEquals("Winston", createdPerson.getFirstName());
-		assertEquals("Leonard Spencer-Churchill", createdPerson.getLastName());
-		assertEquals("Oxfordshire - England", createdPerson.getAddress());
-		assertEquals("Male", createdPerson.getGender());
-		
-		assertFalse(createdPerson.getEnabled());
-	}
-	
-	@Test
-	@Order(5)
 	void testDelete() throws JsonMappingException, JsonProcessingException {
 		
 		given(specification)
-				.pathParam("id", person.getId())
+				.pathParam("id", book.getId())
 				.when()
 					.delete("{id}")
 				.then()
@@ -218,19 +220,19 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
 	}
 	
 	@Test
-	@Order(6)
+	@Order(5)
 	void testFindAll() throws JsonMappingException, JsonProcessingException {
 	    specification = new RequestSpecBuilder()
-	            .setBasePath("/api/person/v1")
+	            .setBasePath("/api/book")
 	            .setPort(port)
 	            .addFilter(new RequestLoggingFilter(LogDetail.ALL))
 	            .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
 	            .build();
 
 	    // Chamada GET no endpoint com paginação
-	    PagedModelPerson response = given(specification)
+	    PagedModelBook response = given(specification)
 	            .accept(MediaType.APPLICATION_YAML_VALUE)
-	            .queryParams("page", 3, "size", 12, "direction", "asc")
+	            .queryParams("page", 0, "size", 5, "direction", "asc")
 	        .when()
 	            .get()
 	        .then()
@@ -238,36 +240,44 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
 	            .contentType(MediaType.APPLICATION_YAML_VALUE)
 	        .extract()
 	            .body()
-	            .as(PagedModelPerson.class, objectMapper);
+	            .as(PagedModelBook.class, objectMapper);
 
 	    // Extrai a lista de pessoas dentro de "content"
-	    List<PersonDTO> people = response.getContent();
+	    List<BookDTO> people = response.getContent();
 
 	    assertNotNull(people);
 	    assertFalse(people.isEmpty(), "A lista de pessoas não deveria estar vazia");
-	    assertTrue(people.size() <= 12, "O tamanho da página deveria respeitar o size definido");
+	    assertTrue(people.size() <= 5, "O tamanho da página deveria respeitar o size definido");
 
-	    PersonDTO first = people.get(0);
-	    PersonDTO fifth = people.get(4);
+	    BookDTO first = people.get(0);
 
 	    assertNotNull(first.getId());
-	    assertNotNull(first.getFirstName());
-	    assertNotNull(first.getLastName());
-
-	    assertNotNull(fifth.getId());
-	    assertNotNull(fifth.getFirstName());
-	    assertNotNull(fifth.getLastName());
+	    assertNotNull(first.getAuthor());
+	    assertNotNull(first.getLaunchDate());
 
 	    System.out.println("✅ Página retornada: " + people.size() + " registros");
-	    System.out.println("Posição 0: " + first.getFirstName() + " " + first.getLastName());
-	    System.out.println("Posição 4: " + fifth.getFirstName() + " " + fifth.getLastName());
+	    System.out.println("Posição 0: " + first.getAuthor() + " " + first.getLaunchDate());
+	    
+	    assertTrue(first.getId() > 0);
+
+	    SimpleDateFormat sdffirst = new SimpleDateFormat("yyyy-MM-dd");
+		String launchDateStrfirst = sdffirst.format(first.getLaunchDate());
+	    assertEquals("Viktor Mayer-Schonberger e Kenneth Kukier", first.getAuthor());
+	    assertEquals("2017-11-07", launchDateStrfirst);
+	    assertEquals(54.0, first.getPrice());
+	    assertEquals("Big Data: como extrair volume, variedade, velocidade e valor da avalanche de informação cotidiana", first.getTitle());
+
 	}
 
-	private void mockPerson() {
-		person.setFirstName("Winston");
-		person.setLastName("Churchill");
-		person.setAddress("Oxfordshire - England");
-		person.setGender("Male");
-		person.setEnabled(true);
+	private void mockBook() {
+		try {
+	        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	        book.setAuthor("Teste Author");
+	        book.setLaunchDate(sdf.parse("2023-03-10"));
+	        book.setPrice(49.90);
+	        book.setTitle("Teste Title");
+	    } catch (ParseException e) {
+	        throw new RuntimeException(e);
+	    }
 	}
 }

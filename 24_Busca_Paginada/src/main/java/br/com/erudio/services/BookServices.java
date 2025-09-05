@@ -77,8 +77,10 @@ public class BookServices {
 	}
 	
 	public BookDTO update(BookDTO book) {
-		logger.info("Updating one Book!");
 		if (book == null) throw new RequiredObjectIsNullException();
+		
+		logger.info("Updating one Book!");
+		
 		Book entity =  repository.findById(book.getId())
 				.orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"));
 		

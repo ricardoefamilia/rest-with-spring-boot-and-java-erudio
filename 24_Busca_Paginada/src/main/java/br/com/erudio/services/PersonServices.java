@@ -108,7 +108,11 @@ public class PersonServices {
 
 	
 	public PersonDTO update(PersonDTO person) {
+		// 👉 Adicione esta verificação logo no início
+	    if (person == null) throw new RequiredObjectIsNullException();
+		
 		logger.info("Updating one Person!");
+		
 		Person entity =  repository.findById(person.getId())
 				.orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"));
 		
