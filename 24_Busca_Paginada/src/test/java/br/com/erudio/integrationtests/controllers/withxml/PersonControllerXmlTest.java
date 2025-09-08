@@ -254,11 +254,81 @@ class PersonControllerXmlTest extends AbstractIntegrationTest {
 	        
 	        System.out.println("Posição 4: " + fifth.getFirstName() + " " + fifth.getLastName());
 	    }
-	    
-	    
-
 	}
+	
+	@Test
+	@Order(7)
+	void testFindByName() throws JsonProcessingException {
+		// http://localhost:8080/api/person/v1/findPeopleByName/and?page=0&size=12&direction=asc
+		
+		// Configuração da especificação da requisição REST Assured
+		specification = new RequestSpecBuilder()
+				.setBasePath("/api/person/v1")
+				.setPort(port)
+				.addFilter(new RequestLoggingFilter(LogDetail.ALL))
+				.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+				.build();
+		
+		// Chamada GET no endpoint com paginação
+		String content = given(specification)
+				.accept(MediaType.APPLICATION_XML_VALUE)
+				.pathParam("firstName", "and")
+				.queryParams("page", 0, "size", 12, "direction", "asc")
+				.when()
+				.get("findPeopleByName/{firstName}")
+				.then()
+				.statusCode(200)
+				.contentType(MediaType.APPLICATION_XML_VALUE)
+				.extract()
+				.body()
+				.asString();
+		
+		// Converte o XML para 
+		PagedModelPerson wrapper = objectMapper.readValue(content, PagedModelPerson.class);
+		
+		// Agora usamos getPeople() diretamente
+		List<PersonDTO> people = wrapper.getContent();
+		
+		// Asserções básicas
+		assertNotNull(people);
+		assertFalse(people.isEmpty(), "A lista de pessoas não deveria estar vazia");
+		assertTrue(people.size() <= 12, "O tamanho da página deveria respeitar o size definido");
+		
+		// Verifica posições específicas (0 e 4)
+		PersonDTO first = people.get(0);
+		
+		assertNotNull(first.getId());
+		assertNotNull(first.getFirstName());
+		assertNotNull(first.getLastName());
+		
+		// Debug opcional
+		System.out.println("✅ Página retornada: " + people.size() + " registros");
+		System.out.println("Posição 0: " + first.getFirstName() + " " + first.getLastName());
+		
+		
+		PersonDTO fifth = people.get(4);
+		assertNotNull(fifth.getId());
+		assertNotNull(fifth.getFirstName());
+		assertNotNull(fifth.getLastName());
+			
+		System.out.println("Posição 4: " + fifth.getFirstName() + " " + fifth.getLastName());
 
+		assertTrue(first.getId() > 0);
+		
+		assertEquals("Alexandrina", first.getFirstName());
+		assertEquals("Hindrick", first.getLastName());
+		assertEquals("3rd Floor", first.getAddress());
+		assertEquals("Female", first.getGender());
+		assertFalse(first.getEnabled());
+	
+		assertTrue(fifth.getId() > 0);
+		
+		assertEquals("Andrus", fifth.getFirstName());
+		assertEquals("Jestico", fifth.getLastName());
+		assertEquals("Room 1110", fifth.getAddress());
+		assertEquals("Male", fifth.getGender());
+		assertTrue(fifth.getEnabled());
+	}
 
 	private void mockPerson() {
 		person.setFirstName("Winston");

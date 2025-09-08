@@ -266,6 +266,76 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	    assertFalse(fifth.getEnabled());
 	    
 	}
+	
+	@Test
+	@Order(7)
+	void testFindByName() throws JsonProcessingException {
+		
+		// http://localhost:8080/api/person/v1/findPeopleByName/and?page=0&size=12&direction=asc
+		
+		// Configuração da especificação da requisição REST Assured
+		specification = new RequestSpecBuilder()
+				.setBasePath("/api/person/v1")
+				.setPort(port)
+				.addFilter(new RequestLoggingFilter(LogDetail.ALL))
+				.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+				.build();
+		
+		// Chamada GET no endpoint com paginação
+		String content = given(specification)
+				.accept(MediaType.APPLICATION_JSON_VALUE)
+				.pathParam("firstName", "and")
+				.queryParams("page", 0, "size", 12, "direction", "asc")
+				.when()
+				.get("findPeopleByName/{firstName}")
+				.then()
+				.statusCode(200)
+				.extract()
+				.body()
+				.asString();
+		
+		// Converte o JSON para EmbeddedResponse<PersonDTO>
+		EmbeddedResponsePersonJson<PersonDTO> response = objectMapper.readValue(
+				content, new TypeReference<EmbeddedResponsePersonJson<PersonDTO>>() {});
+		
+		// Extrai a lista de pessoas dentro de "_embedded"
+		List<PersonDTO> people = response.getEmbedded().getPeople();
+		
+		// Asserções básicas
+		assertNotNull(people);
+		assertFalse(people.isEmpty(), "A lista de pessoas não deveria estar vazia");
+		assertTrue(people.size() <= 12, "O tamanho da página deveria respeitar o size definido");
+		
+		// Verifica posições específicas (0 e 4)
+		PersonDTO first = people.get(0);
+		
+		assertNotNull(first.getId());
+		assertNotNull(first.getFirstName());
+		assertNotNull(first.getLastName());
+		
+		assertTrue(first.getId() > 0);
+		
+		assertEquals("Alexandrina", first.getFirstName());
+		assertEquals("Hindrick", first.getLastName());
+		assertEquals("3rd Floor", first.getAddress());
+		assertEquals("Female", first.getGender());
+		assertFalse(first.getEnabled());
+		
+		PersonDTO fifth = people.get(4);
+		
+		assertNotNull(fifth.getId());
+		assertNotNull(fifth.getFirstName());
+		assertNotNull(fifth.getLastName());
+		
+		assertTrue(fifth.getId() > 0);
+		
+		assertEquals("Andrus", fifth.getFirstName());
+		assertEquals("Jestico", fifth.getLastName());
+		assertEquals("Room 1110", fifth.getAddress());
+		assertEquals("Male", fifth.getGender());
+		assertTrue(fifth.getEnabled());
+		
+	}
 
 	private void mockPerson() {
 		person.setFirstName("Winston");
