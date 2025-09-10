@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>br.com.erudio</groupId>
-	<artifactId>24_Busca_Paginada</artifactId>
+	<artifactId>24_Busca_Paginada_Upload_Download_Arquivos</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>24_Busca_Paginada</name>
+	<name>24_Busca_Paginada_Upload_Download_Arquivos</name>
 
 	<properties>
 		<java.version>21</java.version>

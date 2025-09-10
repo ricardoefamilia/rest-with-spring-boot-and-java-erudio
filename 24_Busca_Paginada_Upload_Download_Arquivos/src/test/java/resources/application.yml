@@ -1,8 +1,12 @@
+server:
+  port: 8888
 cors:
   originPatterns: http://localhost:8080,http://localhost:3000,https://www.erudio.com.br
+file:
+  upload-dir: C:/Users/ricar/OneDrive/Documentos/aaRicardo/Cursos/Java_Spring_Boot_Rest/UploadDir
 spring:
   application:
-    name: 24_Busca_Paginada
+    name: 24_Busca_Paginada_Upload_Download_Arquivos
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/rest_with_spring_boot_java?useTimeZone=true&serverTimezone=UTC
@@ -15,6 +19,12 @@ spring:
       hibernate:
     show-sql: false
     open-in-view: false
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2KB
+      max-file-size: 200MB
+      max-request-size: 215MB
 logging:
   level:
     #root: TRACE / DEBUG / INFO / WARN / ERROR
