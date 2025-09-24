@@ -4,7 +4,7 @@ file:
   upload-dir: C:/Users/ricar/OneDrive/Documentos/aaRicardo/Cursos/Java_Spring_Boot_Rest/UploadDir
 spring:
   application:
-    name: 24_Busca_Paginada_Upload_Download_Arquivos
+    name: 25_Import_Export_Excel_CSV
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/rest_with_spring_boot_java?useTimeZone=true&serverTimezone=UTC
