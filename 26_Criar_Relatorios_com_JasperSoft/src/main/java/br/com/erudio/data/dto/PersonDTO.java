@@ -71,6 +71,10 @@ public class PersonDTO extends RepresentationModel<PersonDTO> implements Seriali
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
+	
+	public String getName() {
+		return (firstName != null ? firstName : "") + (lastName != null ? " " + lastName : "");
+	}
 
 	@Override
 	public int hashCode() {

@@ -10,6 +10,7 @@ import br.com.erudio.exception.handler.CustomEntityResponseHandler;
 import br.com.erudio.file.exporter.MediaTypes;
 import br.com.erudio.file.exporter.contract.FileExporter;
 import br.com.erudio.file.exporter.impl.CsvExporter;
+import br.com.erudio.file.exporter.impl.PdfExporter;
 import br.com.erudio.file.exporter.impl.XlsxExporter;
 
 @Component
@@ -33,6 +34,8 @@ public class FileExporterFactory {
 			return context.getBean(XlsxExporter.class);
 		}else if(acceptHeader.equalsIgnoreCase(MediaTypes.APPLICATION_CSV_VALUE)) {
 			return context.getBean(CsvExporter.class);
+		}else if(acceptHeader.equalsIgnoreCase(MediaTypes.APPLICATION_PDF_VALUE)) {
+			return context.getBean(PdfExporter.class);
 		}else {
 			throw new BadRequestException("Invalid File Format!");
 		}
