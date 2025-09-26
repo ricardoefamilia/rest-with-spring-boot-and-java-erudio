@@ -20,6 +20,7 @@
 		<testcontainers.version>1.20.4</testcontainers.version>
 		<apache.poi.version>5.4.1</apache.poi.version>
 		<commons-csv.version>1.14.1</commons-csv.version>
+		<jasperreports.version>7.0.3</jasperreports.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -45,7 +46,24 @@
 		    <artifactId>poi-ooxml</artifactId>
 		    <version>${apache.poi.version}</version>
 		</dependency>
-		
+		<!-- https://mvnrepository.com/artifact/net.sf.jasperreports/jasperreports -->
+		<dependency>
+		    <groupId>net.sf.jasperreports</groupId>
+		    <artifactId>jasperreports</artifactId>
+		    <version>${jasperreports.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/net.sf.jasperreports/jasperreports-fonts -->
+		<dependency>
+		    <groupId>net.sf.jasperreports</groupId>
+		    <artifactId>jasperreports-fonts</artifactId>
+		    <version>${jasperreports.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/net.sf.jasperreports/jasperreports-pdf -->
+		<dependency>
+		    <groupId>net.sf.jasperreports</groupId>
+		    <artifactId>jasperreports-pdf</artifactId>
+		    <version>${jasperreports.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.hateoas</groupId>
 			<artifactId>spring-hateoas</artifactId>
