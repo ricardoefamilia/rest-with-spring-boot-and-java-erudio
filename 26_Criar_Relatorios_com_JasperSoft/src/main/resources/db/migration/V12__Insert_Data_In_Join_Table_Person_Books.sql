@@ -3,7 +3,7 @@ SELECT
     p.id AS person_id, 
     b.id AS book_id
 FROM 
-    (SELECT id FROM person WHERE id <= 12) p
+    (SELECT id FROM person WHERE id <= 20) p
 CROSS JOIN
     (SELECT id FROM books ORDER BY RAND() LIMIT 20) b;
 
@@ -13,6 +13,6 @@ SELECT
     p.id AS person_id,
     b.id AS book_id
 FROM
-    (SELECT id FROM person WHERE id > 12) p
+    (SELECT id FROM person WHERE id > 20) p
 CROSS JOIN
     (SELECT id FROM books ORDER BY RAND() LIMIT 3) b;

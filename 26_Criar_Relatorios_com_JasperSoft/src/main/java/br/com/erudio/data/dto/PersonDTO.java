@@ -1,10 +1,16 @@
 package br.com.erudio.data.dto;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import br.com.erudio.model.Book;
+import jakarta.persistence.Column;
 
 @Relation(collectionRelation = "people")
 public class PersonDTO extends RepresentationModel<PersonDTO> implements Serializable{
@@ -17,6 +23,12 @@ public class PersonDTO extends RepresentationModel<PersonDTO> implements Seriali
 	private String address;
 	private String gender;
 	private Boolean enabled;
+	
+	private String profileUrl;
+	private String photoUrl;
+	
+	@JsonIgnore
+	private List<Book> books;
 
 	public PersonDTO() {}
 
@@ -72,15 +84,41 @@ public class PersonDTO extends RepresentationModel<PersonDTO> implements Seriali
 		return serialVersionUID;
 	}
 	
+	@JsonIgnore
 	public String getName() {
 		return (firstName != null ? firstName : "") + (lastName != null ? " " + lastName : "");
+	}
+
+	public String getProfileUrl() {
+		return profileUrl;
+	}
+
+	public void setProfileUrl(String profileUrl) {
+		this.profileUrl = profileUrl;
+	}
+
+	public String getPhotoUrl() {
+		return photoUrl;
+	}
+
+	public void setPhotoUrl(String photoUrl) {
+		this.photoUrl = photoUrl;
+	}
+
+	public List<Book> getBooks() {
+		return books;
+	}
+
+	public void setBooks(List<Book> books) {
+		this.books = books;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + Objects.hash(address, enabled, firstName, gender, id, lastName);
+		result = prime * result
+				+ Objects.hash(address, books, enabled, firstName, gender, id, lastName, photoUrl, profileUrl);
 		return result;
 	}
 
@@ -93,9 +131,12 @@ public class PersonDTO extends RepresentationModel<PersonDTO> implements Seriali
 		if (getClass() != obj.getClass())
 			return false;
 		PersonDTO other = (PersonDTO) obj;
-		return Objects.equals(address, other.address) && Objects.equals(enabled, other.enabled)
-				&& Objects.equals(firstName, other.firstName) && Objects.equals(gender, other.gender)
-				&& Objects.equals(id, other.id) && Objects.equals(lastName, other.lastName);
+		return Objects.equals(address, other.address) && Objects.equals(books, other.books)
+				&& Objects.equals(enabled, other.enabled) && Objects.equals(firstName, other.firstName)
+				&& Objects.equals(gender, other.gender) && Objects.equals(id, other.id)
+				&& Objects.equals(lastName, other.lastName) && Objects.equals(photoUrl, other.photoUrl)
+				&& Objects.equals(profileUrl, other.profileUrl);
 	}
+
 	
 }
