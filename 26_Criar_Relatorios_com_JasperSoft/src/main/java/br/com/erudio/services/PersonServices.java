@@ -27,7 +27,7 @@ import br.com.erudio.exception.BadRequestException;
 import br.com.erudio.exception.FileStorageException;
 import br.com.erudio.exception.RequiredObjectIsNullException;
 import br.com.erudio.exception.ResourceNotFoundException;
-import br.com.erudio.file.exporter.contract.FileExporter;
+import br.com.erudio.file.exporter.contract.PersonExporter;
 import br.com.erudio.file.exporter.factory.FileExporterFactory;
 import br.com.erudio.file.importer.contract.FileImporter;
 import br.com.erudio.file.importer.factory.FileImporterFactory;
@@ -79,6 +79,23 @@ public class PersonServices {
 		addHateoasLinks(dto);
 		return dto;
 	}
+	
+	
+	public Resource exportPerson(Long id, String acceptHeader) {
+		logger.info("Exporting data of one Person!");
+		
+		var person = repository.findById(id)
+				.map(entity -> parseObject(entity, PersonDTO.class))
+				.orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"));
+		
+		try {
+			PersonExporter exporter = this.exporter.getExporter(acceptHeader);
+			return exporter.exportPerson(person);
+		} catch (Exception e) {
+			throw new RuntimeException("Error during ");
+		}
+	}
+
 
 	
 	public PersonDTO create(PersonDTO person) {
@@ -191,8 +208,8 @@ public class PersonServices {
 				.getContent();
 		
 		try {
-			FileExporter exporter = this.exporter.getExporter(acceptHeader);
-			return exporter.exportFile(people);
+			PersonExporter exporter = this.exporter.getExporter(acceptHeader);
+			return exporter.exportPeople(people);
 		} catch (Exception e) {
 			throw new RuntimeException("Error during file export: ", e);
 		}

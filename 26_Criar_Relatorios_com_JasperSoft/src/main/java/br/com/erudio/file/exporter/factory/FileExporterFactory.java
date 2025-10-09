@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import br.com.erudio.exception.BadRequestException;
 import br.com.erudio.exception.handler.CustomEntityResponseHandler;
 import br.com.erudio.file.exporter.MediaTypes;
-import br.com.erudio.file.exporter.contract.FileExporter;
+import br.com.erudio.file.exporter.contract.PersonExporter;
 import br.com.erudio.file.exporter.impl.CsvExporter;
 import br.com.erudio.file.exporter.impl.PdfExporter;
 import br.com.erudio.file.exporter.impl.XlsxExporter;
@@ -27,7 +27,7 @@ public class FileExporterFactory {
         this.customEntityResponseHandler = customEntityResponseHandler;
     }
 	
-	public FileExporter getExporter(String acceptHeader) throws Exception{
+	public PersonExporter getExporter(String acceptHeader) throws Exception{
 		
 		if(acceptHeader.equalsIgnoreCase(MediaTypes.APPLICATION_XLSX_VALUE)) {
 			// return new XlsxImporter();

@@ -16,13 +16,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import br.com.erudio.data.dto.PersonDTO;
-import br.com.erudio.file.exporter.contract.FileExporter;
+import br.com.erudio.file.exporter.contract.PersonExporter;
 
 @Component
-public class XlsxExporter implements FileExporter{
+public class XlsxExporter implements PersonExporter{
 
 	@Override
-	public Resource exportFile(List<PersonDTO> people) throws Exception {
+	public Resource exportPeople(List<PersonDTO> people) throws Exception {
 		try (Workbook workbook = new XSSFWorkbook()){
 			//Criando e nomeando a aba da planilha
 			Sheet sheet = workbook.createSheet("People");
@@ -68,6 +68,12 @@ public class XlsxExporter implements FileExporter{
 		style.setAlignment(HorizontalAlignment.CENTER);
 		
 		return style;
+	}
+
+	@Override
+	public Resource exportPerson(PersonDTO person) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

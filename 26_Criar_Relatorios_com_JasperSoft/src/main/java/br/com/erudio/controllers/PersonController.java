@@ -109,7 +109,13 @@ public class PersonController implements PersonControllerDocs {
 	
 //	@CrossOrigin(origins = "http://localhost:8080") // add Cros no application.yml
 	@Override
-	@GetMapping(value = "/{id}", produces= {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
+	@GetMapping(value = "/{id}", 
+		produces= {
+				MediaType.APPLICATION_JSON_VALUE, 
+				MediaType.APPLICATION_XML_VALUE, 
+				MediaType.APPLICATION_YAML_VALUE
+				}
+	)
 	public PersonDTO findById(@PathVariable("id") Long id) {
 		return service.findById(id);
 	}
@@ -158,6 +164,20 @@ public class PersonController implements PersonControllerDocs {
 	public ResponseEntity<?> delete(@PathVariable Long id) {
 		service.delete(id);
 		return ResponseEntity.noContent().build();
+	}
+
+	@Override
+	@GetMapping(value = "/export/{id}", produces= {MediaType.APPLICATION_PDF_VALUE})
+	public ResponseEntity<Resource> export(@PathVariable("id") Long id, HttpServletRequest request) {
+		
+		String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
+		
+		Resource file = service.exportPerson(id, acceptHeader);
+		
+		return ResponseEntity.ok()
+				.contentType(MediaType.parseMediaType(acceptHeader))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename= person.pdf")
+				.body(file);
 	}
 
 }
