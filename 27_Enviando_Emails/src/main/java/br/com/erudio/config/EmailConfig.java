@@ -5,6 +5,8 @@ import java.util.Objects;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import jakarta.annotation.PostConstruct;
+
 @Configuration
 @ConfigurationProperties(prefix = "spring.mail")
 public class EmailConfig {
@@ -17,6 +19,15 @@ public class EmailConfig {
     private boolean ssl;
     
     public EmailConfig() {}
+    
+    @PostConstruct
+    public void init() {
+        System.out.println("📧 Configuração de e-mail carregada:");
+        System.out.println("Host: " + host);
+        System.out.println("Porta: " + port);
+        System.out.println("Usuário: " + username);
+        System.out.println("Senha: " + (password != null ? "********" : "NULA"));
+    }
 
 	public String getHost() {
 		return host;
