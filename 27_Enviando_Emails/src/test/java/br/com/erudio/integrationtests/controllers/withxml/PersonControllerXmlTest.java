@@ -53,6 +53,8 @@ class PersonControllerXmlTest extends AbstractIntegrationTest {
         person.setAddress("Oxfordshire - England");
         person.setGender("Male");
         person.setEnabled(true);
+        person.setProfileUrl("https://pub.erudio.com.br/meus-cursos");
+        person.setPhotoUrl("https://raw.githubusercontent.com/leandrocgsi/rest-with-spring-boot-and-java-erudio/main/photos/00_some_person.jpg");
     }
 
     @Test

@@ -262,10 +262,10 @@ class BookControllerYamlTest extends AbstractIntegrationTest {
 
 	    SimpleDateFormat sdffirst = new SimpleDateFormat("yyyy-MM-dd");
 		String launchDateStrfirst = sdffirst.format(first.getLaunchDate());
-	    assertEquals("Viktor Mayer-Schonberger e Kenneth Kukier", first.getAuthor());
-	    assertEquals("2017-11-07", launchDateStrfirst);
-	    assertEquals(54.0, first.getPrice());
-	    assertEquals("Big Data: como extrair volume, variedade, velocidade e valor da avalanche de informação cotidiana", first.getTitle());
+	    assertEquals("Craig Larman", first.getAuthor());
+	    assertEquals("2018-08-14", launchDateStrfirst);
+	    assertEquals(72.89, first.getPrice());
+	    assertEquals("Agile and Iterative Development: A Manager’s Guide", first.getTitle());
 
 	}
 

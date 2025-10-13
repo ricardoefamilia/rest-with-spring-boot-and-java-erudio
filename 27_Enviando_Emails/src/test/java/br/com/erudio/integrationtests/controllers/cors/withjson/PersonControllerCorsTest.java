@@ -71,9 +71,9 @@ class PersonControllerCorsTest extends AbstractIntegrationTest {
 
 		assertTrue(createdPerson.getId() > 0);
 
-		assertEquals("Richard", createdPerson.getFirstName());
-		assertEquals("Stallman", createdPerson.getLastName());
-		assertEquals("New York City - New York - USA", createdPerson.getAddress());
+		assertEquals("Winston", createdPerson.getFirstName());
+		assertEquals("Churchill", createdPerson.getLastName());
+		assertEquals("Oxfordshire - England", createdPerson.getAddress());
 		assertEquals("Male", createdPerson.getGender());
 
 		assertTrue(createdPerson.getId() > 0);
@@ -122,9 +122,9 @@ class PersonControllerCorsTest extends AbstractIntegrationTest {
 
 		assertTrue(createdPerson.getId() > 0);
 
-		assertEquals("Richard", createdPerson.getFirstName());
-		assertEquals("Stallman", createdPerson.getLastName());
-		assertEquals("New York City - New York - USA", createdPerson.getAddress());
+		assertEquals("Winston", createdPerson.getFirstName());
+		assertEquals("Churchill", createdPerson.getLastName());
+		assertEquals("Oxfordshire - England", createdPerson.getAddress());
 		assertEquals("Male", createdPerson.getGender());
 
 		assertTrue(createdPerson.getId() > 0);
@@ -145,10 +145,12 @@ class PersonControllerCorsTest extends AbstractIntegrationTest {
 	}
 
 	private void mockPerson() {
-		person.setFirstName("Richard");
-		person.setLastName("Stallman");
-		person.setAddress("New York City - New York - USA");
-		person.setGender("Male");
-		person.setEnabled(true);
-	}
+        person.setFirstName("Winston");
+        person.setLastName("Churchill");
+        person.setAddress("Oxfordshire - England");
+        person.setGender("Male");
+        person.setEnabled(true);
+        person.setProfileUrl("https://pub.erudio.com.br/meus-cursos");
+        person.setPhotoUrl("https://raw.githubusercontent.com/leandrocgsi/rest-with-spring-boot-and-java-erudio/main/photos/00_some_person.jpg");
+    }
 }

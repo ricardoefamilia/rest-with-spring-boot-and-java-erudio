@@ -16,6 +16,8 @@ public class PersonDTO implements Serializable{
 	private String address;
 	private String gender;
 	private Boolean enabled;
+	private String profileUrl;
+	private String photoUrl;
 	
 	public PersonDTO() {}
 
@@ -71,9 +73,25 @@ public class PersonDTO implements Serializable{
 		this.enabled = enabled;
 	}
 
+	public String getProfileUrl() {
+		return profileUrl;
+	}
+
+	public void setProfileUrl(String profileUrl) {
+		this.profileUrl = profileUrl;
+	}
+
+	public String getPhotoUrl() {
+		return photoUrl;
+	}
+
+	public void setPhotoUrl(String photoUrl) {
+		this.photoUrl = photoUrl;
+	}
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(address, enabled, firstName, gender, id, lastName);
+		return Objects.hash(address, enabled, firstName, gender, id, lastName, photoUrl, profileUrl);
 	}
 
 	@Override
@@ -87,8 +105,8 @@ public class PersonDTO implements Serializable{
 		PersonDTO other = (PersonDTO) obj;
 		return Objects.equals(address, other.address) && Objects.equals(enabled, other.enabled)
 				&& Objects.equals(firstName, other.firstName) && Objects.equals(gender, other.gender)
-				&& Objects.equals(id, other.id) && Objects.equals(lastName, other.lastName);
+				&& Objects.equals(id, other.id) && Objects.equals(lastName, other.lastName)
+				&& Objects.equals(photoUrl, other.photoUrl) && Objects.equals(profileUrl, other.profileUrl);
 	}
-
 	
 }
