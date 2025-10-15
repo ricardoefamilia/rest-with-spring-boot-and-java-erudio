@@ -1,0 +1,49 @@
+cors:
+  originPatterns: http://localhost:8080,http://localhost:3000,https://www.erudio.com.br
+file:
+  upload-dir: C:/Users/ricar/OneDrive/Documentos/aaRicardo/Cursos/Java_Spring_Boot_Rest/UploadDir
+email:
+  subject: "Default Subject"
+  message: "Default Message"
+spring:
+  application:
+    name: 28_Autentication_JWT_e_Spring_Security
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/rest_with_spring_boot_java?useTimeZone=true&serverTimezone=UTC
+    username: root
+    password: "#Brst516#"
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+    show-sql: false
+    open-in-view: false
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 5000
+      mail.smtp.writetimeout: 5000
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2KB
+      max-file-size: 200MB
+      max-request-size: 215MB
+logging:
+  level:
+    #root: TRACE / DEBUG / INFO / WARN / ERROR
+    root: INFO
+    #br.com.erudio: DEBUG
+spring-doc:
+  paths-to-match: /api/**/v1/**
+  swagger-ui:
+    use-root-path: true
