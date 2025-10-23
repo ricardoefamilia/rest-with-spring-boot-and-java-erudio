@@ -14,6 +14,7 @@ import br.com.erudio.exception.BadRequestException;
 import br.com.erudio.exception.ExceptionResponse;
 import br.com.erudio.exception.FileNotFoundException;
 import br.com.erudio.exception.FileStorageException;
+import br.com.erudio.exception.InvalidJwtAuthenticationException;
 import br.com.erudio.exception.RequiredObjectIsNullException;
 import br.com.erudio.exception.ResourceNotFoundException;
 
@@ -78,6 +79,16 @@ public class CustomEntityResponseHandler extends ResponseEntityExceptionHandler{
 				ex.getMessage(), 
 				request.getDescription(false)); 
 		return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		
+	}
+	
+	@ExceptionHandler(InvalidJwtAuthenticationException.class)
+	public final ResponseEntity<ExceptionResponse> handleInvalidJwtAuthenticationException(Exception ex, WebRequest request){
+		ExceptionResponse response = new ExceptionResponse(
+				new Date(), 
+				ex.getMessage(), 
+				request.getDescription(false)); 
+		return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
 		
 	}
 }
