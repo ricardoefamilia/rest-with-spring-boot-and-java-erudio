@@ -23,7 +23,9 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.erudio.config.TestConfigs;
+import br.com.erudio.integrationtests.dto.AccountCredentialsDTO;
 import br.com.erudio.integrationtests.dto.BookDTO;
+import br.com.erudio.integrationtests.dto.TokenDTO;
 import br.com.erudio.integrationtests.response.json.EmbeddedResponseBookJson;
 import br.com.erudio.integrationtests.testcontainers.AbstractIntegrationTest;
 import io.restassured.builder.RequestSpecBuilder;
@@ -44,6 +46,7 @@ class BookControllerJsonTest extends AbstractIntegrationTest {
 	private static RequestSpecification specification;
 	private static ObjectMapper objectMapper;
 	private static BookDTO book;
+	private static TokenDTO tokenDto;
 
 	@BeforeAll
 	static void setUp() {
@@ -51,20 +54,44 @@ class BookControllerJsonTest extends AbstractIntegrationTest {
 		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
 		book = new BookDTO();
+		tokenDto = new TokenDTO();
+	}
+	
+	@Test
+	@Order(0)
+	void testSignin() {
+		AccountCredentialsDTO credentials = new AccountCredentialsDTO("leandro", "admin123");
+		
+		tokenDto = given()
+				.basePath("/auth/signin")
+				.port(port)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.body(credentials)
+				.when()
+				.post()
+				.then()
+				.statusCode(200)
+				.extract()
+				.body()
+				.as(TokenDTO.class);
+		
+		specification = new RequestSpecBuilder()
+				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_ERUDIO)
+				.addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenDto.getAccessToken())
+				.setBasePath("/api/book")
+				.setPort(port) // porta dinâmica
+					.addFilter(new RequestLoggingFilter(LogDetail.ALL))
+					.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+				.build();
+		
+		assertNotNull(tokenDto.getAccessToken());
+		assertNotNull(tokenDto.getRefreshToken());
 	}
 
 	@Test
 	@Order(1)
 	void testCreate() throws JsonMappingException, JsonProcessingException {
 		mockbook();
-
-		specification = new RequestSpecBuilder()
-				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_ERUDIO)
-				.setBasePath("/api/book")
-				.setPort(port) // porta dinâmica
-					.addFilter(new RequestLoggingFilter(LogDetail.ALL))
-					.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-				.build();
 
 		var content = given(specification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -207,16 +234,7 @@ class BookControllerJsonTest extends AbstractIntegrationTest {
 	@Order(5)
 	@DisplayName("Deve retornar a página 0 e validar posições específicas")
 	void testFindAllbooksWithPagination() throws JsonProcessingException {
-		
-		// Configuração da especificação da requisição REST Assured
-	    specification = new RequestSpecBuilder()
-	            .setBasePath("/api/book")
-	            .setPort(port)
-	            .addFilter(new RequestLoggingFilter(LogDetail.ALL))
-	            .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-	            .build();
-
-	    // Chamada GET no endpoint com paginação
+		// Chamada GET no endpoint com paginação
 	    String content = given(specification)
 	            .accept(MediaType.APPLICATION_JSON_VALUE)
 	            .queryParams("page", 0, "size", 5, "direction", "asc")

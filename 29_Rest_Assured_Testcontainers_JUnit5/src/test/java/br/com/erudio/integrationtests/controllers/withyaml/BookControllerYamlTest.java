@@ -20,7 +20,9 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import br.com.erudio.config.TestConfigs;
 import br.com.erudio.integrationtests.controllers.withyaml.mapper.YAMLMapper;
+import br.com.erudio.integrationtests.dto.AccountCredentialsDTO;
 import br.com.erudio.integrationtests.dto.BookDTO;
+import br.com.erudio.integrationtests.dto.TokenDTO;
 import br.com.erudio.integrationtests.response.xml_yaml.PagedModelBook;
 import br.com.erudio.integrationtests.testcontainers.AbstractIntegrationTest;
 import io.restassured.builder.RequestSpecBuilder;
@@ -44,26 +46,51 @@ class BookControllerYamlTest extends AbstractIntegrationTest {
 	private static RequestSpecification specification;
 	private static YAMLMapper objectMapper;
 	private static BookDTO book;
+	private static TokenDTO tokenDto;
 
 	@BeforeAll
 	static void setUp() {
 		objectMapper = new YAMLMapper();
 
 		book = new BookDTO();
+		tokenDto = new TokenDTO();
+	}
+	
+	@Test
+	@Order(0)
+	void testSignin() {
+		AccountCredentialsDTO credentials = new AccountCredentialsDTO("leandro", "admin123");
+		
+		tokenDto = given()
+				.basePath("/auth/signin")
+				.port(port)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.body(credentials)
+				.when()
+				.post()
+				.then()
+				.statusCode(200)
+				.extract()
+				.body()
+				.as(TokenDTO.class);
+		
+		specification = new RequestSpecBuilder()
+				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_ERUDIO)
+				.addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenDto.getAccessToken())
+				.setBasePath("/api/book")
+				.setPort(port) // porta dinâmica
+					.addFilter(new RequestLoggingFilter(LogDetail.ALL))
+					.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+				.build();
+		
+		assertNotNull(tokenDto.getAccessToken());
+		assertNotNull(tokenDto.getRefreshToken());
 	}
 
 	@Test
 	@Order(1)
 	void testCreate() throws JsonMappingException, JsonProcessingException {
 		mockBook();
-
-		specification = new RequestSpecBuilder()
-				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_ERUDIO)
-				.setBasePath("/api/book")
-				.setPort(port) // porta dinâmica
-					.addFilter(new RequestLoggingFilter(LogDetail.ALL))
-					.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-				.build();
 
 		var createdBook = given().config(
 				RestAssuredConfig.config()
@@ -222,13 +249,6 @@ class BookControllerYamlTest extends AbstractIntegrationTest {
 	@Test
 	@Order(5)
 	void testFindAll() throws JsonMappingException, JsonProcessingException {
-	    specification = new RequestSpecBuilder()
-	            .setBasePath("/api/book")
-	            .setPort(port)
-	            .addFilter(new RequestLoggingFilter(LogDetail.ALL))
-	            .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-	            .build();
-
 	    // Chamada GET no endpoint com paginação
 	    PagedModelBook response = given(specification)
 	            .accept(MediaType.APPLICATION_YAML_VALUE)

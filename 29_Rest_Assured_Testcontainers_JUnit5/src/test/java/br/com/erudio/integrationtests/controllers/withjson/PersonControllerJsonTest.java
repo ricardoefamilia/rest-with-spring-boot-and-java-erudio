@@ -21,7 +21,9 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.erudio.config.TestConfigs;
+import br.com.erudio.integrationtests.dto.AccountCredentialsDTO;
 import br.com.erudio.integrationtests.dto.PersonDTO;
+import br.com.erudio.integrationtests.dto.TokenDTO;
 import br.com.erudio.integrationtests.response.json.EmbeddedResponsePersonJson;
 import br.com.erudio.integrationtests.testcontainers.AbstractIntegrationTest;
 import io.restassured.builder.RequestSpecBuilder;
@@ -42,6 +44,7 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	private static RequestSpecification specification;
 	private static ObjectMapper objectMapper;
 	private static PersonDTO person;
+	private static TokenDTO tokenDto;
 
 	@BeforeAll
 	static void setUp() {
@@ -49,20 +52,44 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
 		person = new PersonDTO();
+		tokenDto = new TokenDTO();
+	}
+	
+	@Test
+	@Order(0)
+	void testSignin() {
+		AccountCredentialsDTO credentials = new AccountCredentialsDTO("leandro", "admin123");
+		
+		tokenDto = given()
+				.basePath("/auth/signin")
+				.port(port)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.body(credentials)
+				.when()
+				.post()
+				.then()
+				.statusCode(200)
+				.extract()
+				.body()
+				.as(TokenDTO.class);
+		
+		specification = new RequestSpecBuilder()
+				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_ERUDIO)
+				.addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenDto.getAccessToken())
+				.setBasePath("/api/person/v1")
+				.setPort(port) // porta dinâmica
+					.addFilter(new RequestLoggingFilter(LogDetail.ALL))
+					.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+				.build();
+		
+		assertNotNull(tokenDto.getAccessToken());
+		assertNotNull(tokenDto.getRefreshToken());
 	}
 
 	@Test
 	@Order(1)
 	void testCreate() throws JsonMappingException, JsonProcessingException {
 		mockPerson();
-
-		specification = new RequestSpecBuilder()
-				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_ERUDIO)
-				.setBasePath("/api/person/v1")
-				.setPort(port) // porta dinâmica
-					.addFilter(new RequestLoggingFilter(LogDetail.ALL))
-					.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-				.build();
 
 		var content = given(specification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -203,14 +230,6 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	@Order(6)
 	@DisplayName("Deve retornar a página 3 e validar posições específicas")
 	void testFindAllPeopleWithPagination() throws JsonProcessingException {
-		
-		// Configuração da especificação da requisição REST Assured
-	    specification = new RequestSpecBuilder()
-	            .setBasePath("/api/person/v1")
-	            .setPort(port)
-	            .addFilter(new RequestLoggingFilter(LogDetail.ALL))
-	            .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-	            .build();
 
 	    // Chamada GET no endpoint com paginação
 	    String content = given(specification)
@@ -270,17 +289,7 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	@Test
 	@Order(7)
 	void testFindByName() throws JsonProcessingException {
-		
-		// http://localhost:8080/api/person/v1/findPeopleByName/and?page=0&size=12&direction=asc
-		
-		// Configuração da especificação da requisição REST Assured
-		specification = new RequestSpecBuilder()
-				.setBasePath("/api/person/v1")
-				.setPort(port)
-				.addFilter(new RequestLoggingFilter(LogDetail.ALL))
-				.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-				.build();
-		
+	
 		// Chamada GET no endpoint com paginação
 		String content = given(specification)
 				.accept(MediaType.APPLICATION_JSON_VALUE)

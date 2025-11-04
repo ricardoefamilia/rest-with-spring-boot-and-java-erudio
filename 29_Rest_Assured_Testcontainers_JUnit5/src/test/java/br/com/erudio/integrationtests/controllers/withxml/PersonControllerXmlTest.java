@@ -19,7 +19,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 import br.com.erudio.config.TestConfigs;
+import br.com.erudio.integrationtests.dto.AccountCredentialsDTO;
 import br.com.erudio.integrationtests.dto.PersonDTO;
+import br.com.erudio.integrationtests.dto.TokenDTO;
 import br.com.erudio.integrationtests.response.xml_yaml.PagedModelPerson;
 import br.com.erudio.integrationtests.testcontainers.AbstractIntegrationTest;
 import io.restassured.builder.RequestSpecBuilder;
@@ -38,6 +40,7 @@ class PersonControllerXmlTest extends AbstractIntegrationTest {
     private static RequestSpecification specification;
     private static XmlMapper objectMapper;
     private static PersonDTO person;
+	private static TokenDTO tokenDto;
 
     @BeforeAll
     static void setUp() {
@@ -45,6 +48,7 @@ class PersonControllerXmlTest extends AbstractIntegrationTest {
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
         person = new PersonDTO(); // DTO simplificado
+		tokenDto = new TokenDTO();
     }
 
     private void mockPerson() {
@@ -56,19 +60,42 @@ class PersonControllerXmlTest extends AbstractIntegrationTest {
         person.setProfileUrl("https://pub.erudio.com.br/meus-cursos");
         person.setPhotoUrl("https://raw.githubusercontent.com/leandrocgsi/rest-with-spring-boot-and-java-erudio/main/photos/00_some_person.jpg");
     }
-
+    
     @Test
-    @Order(1)
-    void testCreate() throws JsonProcessingException {
-        mockPerson();
-
-        specification = new RequestSpecBuilder()
+	@Order(0)
+	void testSignin() {
+		AccountCredentialsDTO credentials = new AccountCredentialsDTO("leandro", "admin123");
+		
+		tokenDto = given()
+				.basePath("/auth/signin")
+				.port(port)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.body(credentials)
+				.when()
+				.post()
+				.then()
+				.statusCode(200)
+				.extract()
+				.body()
+				.as(TokenDTO.class);
+		
+		specification = new RequestSpecBuilder()
                 .addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_ERUDIO)
+				.addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenDto.getAccessToken())
                 .setBasePath("/api/person/v1")
                 .setPort(port)
                 .addFilter(new RequestLoggingFilter(LogDetail.ALL))
                 .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
                 .build();
+		
+		assertNotNull(tokenDto.getAccessToken());
+		assertNotNull(tokenDto.getRefreshToken());
+	}
+
+    @Test
+    @Order(1)
+    void testCreate() throws JsonProcessingException {
+        mockPerson();
 
         String content = given(specification)
                 .contentType(MediaType.APPLICATION_XML_VALUE)
@@ -176,13 +203,6 @@ class PersonControllerXmlTest extends AbstractIntegrationTest {
     @Test
     @Order(6)
     void testFindAll() throws JsonProcessingException {
-        specification = new RequestSpecBuilder()
-                .setBasePath("/api/person/v1")
-                .setPort(port)
-                .addFilter(new RequestLoggingFilter(LogDetail.ALL))
-                .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-                .build();
-
         String content = given(specification)
                 .accept(MediaType.APPLICATION_XML_VALUE)
                 .queryParams("page", 0, "size", 12, "direction", "asc")

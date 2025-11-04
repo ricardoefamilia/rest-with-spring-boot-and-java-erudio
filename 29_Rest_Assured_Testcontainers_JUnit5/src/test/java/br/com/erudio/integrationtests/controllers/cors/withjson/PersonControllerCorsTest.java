@@ -18,6 +18,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.erudio.config.TestConfigs;
 import br.com.erudio.data.dto.PersonDTO;
+import br.com.erudio.integrationtests.dto.AccountCredentialsDTO;
+import br.com.erudio.integrationtests.dto.TokenDTO;
 import br.com.erudio.integrationtests.testcontainers.AbstractIntegrationTest;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
@@ -37,6 +39,7 @@ class PersonControllerCorsTest extends AbstractIntegrationTest {
 	private static RequestSpecification specification;
 	private static ObjectMapper objectMapper;
 	private static PersonDTO person;
+	private static TokenDTO tokenDto;
 
 	@BeforeAll
 	static void setUp() {
@@ -44,6 +47,29 @@ class PersonControllerCorsTest extends AbstractIntegrationTest {
 		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
 		person = new PersonDTO();
+		tokenDto = new TokenDTO();
+	}
+	
+	@Test
+	@Order(0)
+	void testSignin() {
+		AccountCredentialsDTO credentials = new AccountCredentialsDTO("leandro", "admin123");
+		
+		tokenDto = given()
+				.basePath("/auth/signin")
+				.port(port)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.body(credentials)
+				.when()
+				.post()
+				.then()
+				.statusCode(200)
+				.extract()
+				.body()
+				.as(TokenDTO.class);
+		
+		assertNotNull(tokenDto.getAccessToken());
+		assertNotNull(tokenDto.getRefreshToken());
 	}
 
 	@Test
@@ -51,7 +77,9 @@ class PersonControllerCorsTest extends AbstractIntegrationTest {
 	void testCreate() throws JsonMappingException, JsonProcessingException {
 		mockPerson();
 
-		specification = new RequestSpecBuilder().addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_ERUDIO)
+		specification = new RequestSpecBuilder()
+				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_ERUDIO)
+				.addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenDto.getAccessToken())
 				.setBasePath("/api/person/v1").setPort(port) // porta dinâmica
 				.addFilter(new RequestLoggingFilter(LogDetail.ALL)).addFilter(new ResponseLoggingFilter(LogDetail.ALL))
 				.build();
@@ -85,7 +113,9 @@ class PersonControllerCorsTest extends AbstractIntegrationTest {
 	void testCorsBlockedOrigin() throws JsonProcessingException {
 
 		// Specification com origem não autorizada
-		var blockedSpec = new RequestSpecBuilder().addHeader(TestConfigs.HEADER_PARAM_ORIGIN, "http://localhost:4000") // origem
+		var blockedSpec = new RequestSpecBuilder()
+				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, "http://localhost:4000") // origem
+				.addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenDto.getAccessToken())
 																														// não
 																														// permitida
 				.setBasePath("/api/person/v1").setPort(port).addFilter(new RequestLoggingFilter(LogDetail.ALL))
@@ -104,7 +134,9 @@ class PersonControllerCorsTest extends AbstractIntegrationTest {
 	@Test
 	@Order(3)
 	void testFindById() throws JsonMappingException, JsonProcessingException {
-		specification = new RequestSpecBuilder().addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_HOST3000)
+		specification = new RequestSpecBuilder()
+				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_HOST3000)
+				.addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenDto.getAccessToken())
 				.setBasePath("/api/person/v1").setPort(port).addFilter(new RequestLoggingFilter(LogDetail.ALL))
 				.addFilter(new ResponseLoggingFilter(LogDetail.ALL)).build();
 
@@ -134,7 +166,9 @@ class PersonControllerCorsTest extends AbstractIntegrationTest {
 	@Test
 	@Order(4)
 	void testFindByIdWithWrongOrigin() throws JsonMappingException, JsonProcessingException {
-		specification = new RequestSpecBuilder().addHeader(TestConfigs.HEADER_PARAM_ORIGIN, "http://localhost:4000")
+		specification = new RequestSpecBuilder()
+				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, "http://localhost:4000")
+				.addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenDto.getAccessToken())
 				.setBasePath("/api/person/v1").setPort(port).addFilter(new RequestLoggingFilter(LogDetail.ALL))
 				.addFilter(new ResponseLoggingFilter(LogDetail.ALL)).build();
 

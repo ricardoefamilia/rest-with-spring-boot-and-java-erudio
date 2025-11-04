@@ -20,6 +20,18 @@ public class PersonDTO implements Serializable{
 	private String photoUrl;
 	
 	public PersonDTO() {}
+	
+	public PersonDTO(Long id, String firstName, String lastName, String address, 
+            String gender, Boolean enabled, String profileUrl, String photoUrl) {
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.address = address;
+		this.gender = gender;
+		this.enabled = enabled;
+		this.profileUrl = profileUrl;
+		this.photoUrl = photoUrl;
+	}
 
 	public Long getId() {
 		return id;
@@ -59,10 +71,6 @@ public class PersonDTO implements Serializable{
 
 	public void setGender(String gender) {
 		this.gender = gender;
-	}
-
-	public static long getSerialversionuid() {
-		return serialVersionUID;
 	}
 
 	public Boolean getEnabled() {

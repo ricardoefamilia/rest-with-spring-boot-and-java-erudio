@@ -14,7 +14,7 @@ email:
   message: "Default Message"
 spring:
   application:
-    name: 28_Autentication_JWT_e_Spring_Security
+    name: 29_Rest_Assured_Testcontainers_JUnit5
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/rest_with_spring_boot_java?useTimeZone=true&serverTimezone=UTC

@@ -7,22 +7,19 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import br.com.erudio.integrationtests.testcontainers.AbstractIntegrationTest;
 import br.com.erudio.model.Person;
 
-@ExtendWith(SpringExtension.class) //integra o spring framework com o JUnit 5 para uso de componentes, bins e recursos configurados no ambiente de testes - fundamental para testes que dependem do spring content
-@DataJpaTest //configura o teste para trabalhar com JPA - camada de persistência (repository, model (entity), banco de dados (h2, test containers, outros bd...)
-@AutoConfigureTestDatabase(replace = Replace.NONE) //replace none bloqueia acesso ao bd h2 nativo e dá oportunidade para utilizar bd real utilizado na app
+//@ExtendWith(SpringExtension.class) //integra o spring framework com o JUnit 5 para uso de componentes, bins e recursos configurados no ambiente de testes - fundamental para testes que dependem do spring content
+//@DataJpaTest //configura o teste para trabalhar com JPA - camada de persistência (repository, model (entity), banco de dados (h2, test containers, outros bd...)
+//@AutoConfigureTestDatabase(replace = Replace.NONE) //replace none bloqueia acesso ao bd h2 nativo e dá oportunidade para utilizar bd real utilizado na app
+@SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class) //ordena a execução dos testes, principalmente quando o estado de um teste depende de outro
 class PersonRepositoryTest extends AbstractIntegrationTest{
 	

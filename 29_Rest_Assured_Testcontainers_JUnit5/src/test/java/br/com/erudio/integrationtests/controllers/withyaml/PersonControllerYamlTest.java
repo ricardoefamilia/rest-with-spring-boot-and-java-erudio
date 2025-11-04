@@ -18,7 +18,9 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import br.com.erudio.config.TestConfigs;
 import br.com.erudio.integrationtests.controllers.withyaml.mapper.YAMLMapper;
+import br.com.erudio.integrationtests.dto.AccountCredentialsDTO;
 import br.com.erudio.integrationtests.dto.PersonDTO;
+import br.com.erudio.integrationtests.dto.TokenDTO;
 import br.com.erudio.integrationtests.response.xml_yaml.PagedModelPerson;
 import br.com.erudio.integrationtests.testcontainers.AbstractIntegrationTest;
 import io.restassured.builder.RequestSpecBuilder;
@@ -42,26 +44,51 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
 	private static RequestSpecification specification;
 	private static YAMLMapper objectMapper;
 	private static PersonDTO person;
+	private static TokenDTO tokenDto;
 
 	@BeforeAll
 	static void setUp() {
 		objectMapper = new YAMLMapper();
 
 		person = new PersonDTO();
+		tokenDto = new TokenDTO();
+	}
+	
+	@Test
+	@Order(0)
+	void testSignin() {
+		AccountCredentialsDTO credentials = new AccountCredentialsDTO("leandro", "admin123");
+		
+		tokenDto = given()
+				.basePath("/auth/signin")
+				.port(port)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.body(credentials)
+				.when()
+				.post()
+				.then()
+				.statusCode(200)
+				.extract()
+				.body()
+				.as(TokenDTO.class);
+		
+		specification = new RequestSpecBuilder()
+				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_ERUDIO)
+				.addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenDto.getAccessToken())
+				.setBasePath("/api/person/v1")
+				.setPort(port) // porta dinâmica
+					.addFilter(new RequestLoggingFilter(LogDetail.ALL))
+					.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+				.build();
+		
+		assertNotNull(tokenDto.getAccessToken());
+		assertNotNull(tokenDto.getRefreshToken());
 	}
 
 	@Test
 	@Order(1)
 	void testCreate() throws JsonMappingException, JsonProcessingException {
 		mockPerson();
-
-		specification = new RequestSpecBuilder()
-				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_ERUDIO)
-				.setBasePath("/api/person/v1")
-				.setPort(port) // porta dinâmica
-					.addFilter(new RequestLoggingFilter(LogDetail.ALL))
-					.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-				.build();
 
 		var createdPerson = given().config(
 				RestAssuredConfig.config()
@@ -220,13 +247,6 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
 	@Test
 	@Order(6)
 	void testFindAll() throws JsonMappingException, JsonProcessingException {
-	    specification = new RequestSpecBuilder()
-	            .setBasePath("/api/person/v1")
-	            .setPort(port)
-	            .addFilter(new RequestLoggingFilter(LogDetail.ALL))
-	            .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-	            .build();
-
 	    // Chamada GET no endpoint com paginação
 	    PagedModelPerson response = given(specification)
 	            .accept(MediaType.APPLICATION_YAML_VALUE)
@@ -267,13 +287,6 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
 	@Order(7)
 	void testFindByName() throws JsonMappingException, JsonProcessingException {
 		// http://localhost:8080/api/person/v1/findPeopleByName/and?page=0&size=12&direction=asc
-		
-		specification = new RequestSpecBuilder()
-				.setBasePath("/api/person/v1")
-				.setPort(port)
-				.addFilter(new RequestLoggingFilter(LogDetail.ALL))
-				.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-				.build();
 		
 		// Chamada GET no endpoint com paginação
 		PagedModelPerson response = given(specification)
